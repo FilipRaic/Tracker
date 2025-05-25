@@ -1,4 +1,4 @@
-package hr.tvz.tracker;
+package hr.tvz.trackerplatform;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
