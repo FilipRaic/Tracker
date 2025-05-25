@@ -13,13 +13,12 @@ jobs:
         with:
           fetch-depth: 0 # Required for SonarQube to analyze git history
 
-      # Set up Java environment
       - name: Set up Java
         uses: actions/setup-java@v4
         with:
-          java-version: '24.0.1'
-          distribution: 'corretto'
-          cache: 'gradle'
+          java-version: "24"
+          distribution: "corretto"
+          cache: "gradle"
 
       - name: Run tests
         run: ./gradlew test

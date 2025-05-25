@@ -4,13 +4,6 @@ on:
   push:
     branches:
       - '**' # Run for pushes to any branch
-    pull_request:
-      types:
-        - opened
-        - synchronize
-        - ready_for_review # Run only when PR is marked "Ready for Review"
-      branches:
-        - '**' # Run for PRs targeting any branch
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
