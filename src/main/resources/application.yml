@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: tracker
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    tomcat:
+      initial-size: 15
+      max-wait: 20000
+      max-active: 50
+      max-idle: 15
+      min-idle: 8
+      default-auto-commit: true
+      name: ps-tomcat-jdbc
+      validation-query: select 1
+      test-on-borrow: true
+      removeAbandoned: true
+      removeAbandonedTimeout: 3600
+      logAbandoned: true
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+  sql:
+    init:
+      mode: always
+
+  springdoc:
+    api-docs:
+      path: /api-docs
+    packages-to-scan: hr.tvz.tracker
+    swagger-ui:
+      path: /swagger-ui.html
+      default-models-expand-depth: -1
+      syntaxHighlight:
+        activated: false
+
+logging:
+  level:
+    org:
+      springframework:
+        web: DEBUG
+        socket: DEBUG
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+application:
+  security:
+    jwt:
+      secret-key: ZjMzYzM4NzYzMTg0OWE4ZTY5M2ZlYjZhMDIyMjA4ZGQzYTNlZmQ4ZmU0MzU3ZThhNTc1Yzg1NTZiYzEyY2VlNzM5ZGM2MjdkMGY5NWMyY2Y5NmRiMDg3ZGFkOTM3NWEwODA5ODJjZWQ3NGI0MDdiMzZmYzlhOGU0NTEyODFmYzg=
+      expiration: 3600000

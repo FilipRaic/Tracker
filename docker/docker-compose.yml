@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  database:
+    image: 'postgres:17.5-alpine'
+    hostname: postgres
+    restart: always
+    container_name: tracker_platform_db
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5433:5432"
+
+  maildev:
+    image: maildev/maildev
+    ports:
+      - '1081:1080'
+      - '1026:1025'
+    volumes:
+      - ./maildev-data:/home/maildev/data
+    command: bin/maildev --mail-directory /home/maildev/data
