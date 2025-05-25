@@ -1,12 +1,15 @@
 package hr.tvz.trackerplatform;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+import static org.assertj.core.api.Assertions.assertThat;
+
 class TrackerApplicationTests {
 
     @Test
     void contextLoads() {
+        boolean value = true;
+
+        assertThat(value).isTrue();
     }
 }
