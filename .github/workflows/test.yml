@@ -20,8 +20,8 @@ jobs:
           distribution: "corretto"
           cache: "gradle"
 
-      - name: Make gradlew executable
-        run: chmod +x ./gradlew
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Clear Gradle cache
         run: rm -rf ~/.gradle/caches/
@@ -29,4 +29,4 @@ jobs:
       - name: Run tests
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
-        run: ./gradlew test --no-daemon --enable-native-access=ALL-UNNAMED
+        run: ./gradlew test
