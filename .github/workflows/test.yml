@@ -18,13 +18,12 @@ jobs:
         with:
           java-version: "24"
           distribution: "corretto"
-          cache: "gradle"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      - name: Clear Gradle cache
-        run: rm -rf ~/.gradle/caches/
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
       - name: Run tests
         env:
