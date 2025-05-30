@@ -17,6 +17,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -119,6 +120,23 @@ public class HabitServiceTest {
 
         // then
         assertEquals(expectedStatus, habitStatusDTO);
+    }
+
+    @Test
+    void deleteHabit() {
+        // given
+        Long habitId = 1L;
+        HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
+        Habit habit = new Habit(habitId, "Workout", LocalDate.now(), null, dailyFrequency);
+        when(habitRepository.findById(eq(habitId))).thenReturn(Optional.of(habit));
+
+        // when
+        habitService.deleteHabit(habitId);
+
+        // then
+        verify(habitRepository).findById(habitId);
+        verify(habitCompletionRepository).deleteByHabit(habit);
+        verify(habitRepository).delete(habit);
     }
 
     private HabitStatusDTO buildHabitStatusDTO(Habit habit, LocalDate completionDate, boolean done) {

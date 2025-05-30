@@ -7,6 +7,7 @@ import hr.tvz.trackerplatform.repository.HabitRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -55,6 +56,15 @@ public class HabitServiceImpl implements HabitService{
         habitCompletion.setDone(!habitCompletion.getDone());
         HabitCompletion updatedHabitCompletion = habitCompletionRepository.save(habitCompletion);
         return mapToHabitWithStatusDTO(updatedHabitCompletion);
+    }
+
+    @Override
+    @Transactional
+    public void deleteHabit(Long habitId) {
+        Habit habit = habitRepository.findById(habitId)
+                .orElseThrow(() -> new EntityNotFoundException("Habit should exist"));
+        habitCompletionRepository.deleteByHabit(habit);
+        habitRepository.delete(habit);
     }
 
     private HabitCompletion findCurrentHabitCompletionOrThrowException(Habit habit) {

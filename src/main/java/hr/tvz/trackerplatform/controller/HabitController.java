@@ -41,4 +41,10 @@ public class HabitController {
         HabitStatusDTO habitStatusDTO = habitService.changeHabitStatus(habitId);
         return ResponseEntity.ok(habitStatusDTO);
     }
+
+    @DeleteMapping("/{habitId}")
+    public ResponseEntity<Void> deleteHabit(@PathVariable Long habitId) {
+        habitService.deleteHabit(habitId);
+        return ResponseEntity.noContent().build();
+    }
 }
