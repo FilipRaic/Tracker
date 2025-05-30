@@ -1,6 +1,7 @@
 package hr.tvz.trackerplatform.controller;
 
 import hr.tvz.trackerplatform.model.HabitDTO;
+import hr.tvz.trackerplatform.model.HabitStatusDTO;
 import hr.tvz.trackerplatform.service.HabitService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,11 +22,23 @@ public class HabitController {
         return ResponseEntity.ok(habitDTOS);
     }
 
+    @GetMapping("/status")
+    public ResponseEntity<List<HabitStatusDTO>> findCurrentHabitsWithStatus() {
+        List<HabitStatusDTO> currentHabitsWithStatus = habitService.findCurrentHabitsWithStatus();
+        return ResponseEntity.ok(currentHabitsWithStatus);
+    }
+
     @PostMapping
     public ResponseEntity<HabitDTO> createHabit(@RequestBody HabitDTO habitDTO) {
         HabitDTO createdHabit = habitService.create(habitDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(createdHabit);
+    }
+
+    @PutMapping("/status/{habitId}")
+    public ResponseEntity<HabitStatusDTO> changeHabitStatus(@PathVariable Long habitId) {
+        HabitStatusDTO habitStatusDTO = habitService.changeHabitStatus(habitId);
+        return ResponseEntity.ok(habitStatusDTO);
     }
 }
