@@ -2,7 +2,7 @@ package hr.tvz.trackerplatform.journal_entry.controller;
 
 import hr.tvz.trackerplatform.journal_entry.dto.JournalEntryDTO;
 import hr.tvz.trackerplatform.journal_entry.service.JournalEntryService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,10 +11,11 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
-@AllArgsConstructor
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/journal")
 public class JournalEntryController {
+
     private final JournalEntryService journalEntryService;
 
     @GetMapping
@@ -31,17 +32,16 @@ public class JournalEntryController {
 
     @PostMapping
     public ResponseEntity<JournalEntryDTO> createJournalEntry(@RequestBody JournalEntryDTO journalEntryDTO) {
-        System.out.println(journalEntryDTO.getDate());
         JournalEntryDTO createdJournalEntry = journalEntryService.create(journalEntryDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(createdJournalEntry);
     }
 
-    @DeleteMapping("/date/{date}")
+    @DeleteMapping("/{date}")
     public ResponseEntity<Void> deleteByDate(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         try {
-            journalEntryService.deleteByDate(date);
+            journalEntryService.delete(date);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
@@ -53,5 +53,4 @@ public class JournalEntryController {
         JournalEntryDTO updatedJournalEntryDTO = journalEntryService.update(journalEntryDTO, date);
         return new ResponseEntity<>(updatedJournalEntryDTO, HttpStatus.OK);
     }
-
 }

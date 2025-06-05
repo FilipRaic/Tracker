@@ -4,7 +4,7 @@ import hr.tvz.trackerplatform.journal_entry.dto.JournalEntryDTO;
 import hr.tvz.trackerplatform.journal_entry.model.JournalEntry;
 import hr.tvz.trackerplatform.journal_entry.repository.JournalEntryRepository;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class JournalEntryServiceImpl implements JournalEntryService {
 
     private final JournalEntryRepository journalEntryRepository;
@@ -37,8 +37,9 @@ public class JournalEntryServiceImpl implements JournalEntryService {
     }
 
     @Override
-    public void deleteByDate(LocalDate date) {
-        journalEntryRepository.deleteByDate(date);
+    public void delete(LocalDate date) {
+        Long id = journalEntryRepository.findByDate(date).getId();
+        journalEntryRepository.deleteById(id);
     }
 
     @Override

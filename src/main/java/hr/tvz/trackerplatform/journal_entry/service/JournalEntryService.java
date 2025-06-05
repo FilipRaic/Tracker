@@ -12,7 +12,7 @@ public interface JournalEntryService {
 
     JournalEntryDTO findByDate(LocalDate date);
 
-    void deleteByDate(LocalDate date);
+    void delete(LocalDate date);
 
     JournalEntryDTO update(JournalEntryDTO journalEntryDTO, LocalDate date);
 }

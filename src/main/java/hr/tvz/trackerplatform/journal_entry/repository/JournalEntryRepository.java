@@ -10,5 +10,5 @@ import java.time.LocalDate;
 public interface JournalEntryRepository extends JpaRepository<JournalEntry, Long> {
     JournalEntry findByDate(LocalDate date);
 
-    void deleteByDate(LocalDate date);
+    void deleteById(Long id);
 }
