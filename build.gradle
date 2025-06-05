@@ -40,8 +40,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation("org.modelmapper:modelmapper:3.2.3")
+    implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.9.10")
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
     implementation("org.flywaydb:flyway-database-postgresql")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.19.0")
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.projectlombok:lombok'

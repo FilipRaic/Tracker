@@ -1,9 +1,14 @@
 package hr.tvz.trackerplatform.service;
 
-import hr.tvz.trackerplatform.model.*;
-import hr.tvz.trackerplatform.repository.HabitCompletionRepository;
-import hr.tvz.trackerplatform.repository.HabitFrequencyRepository;
-import hr.tvz.trackerplatform.repository.HabitRepository;
+import hr.tvz.trackerplatform.habit.dto.HabitDTO;
+import hr.tvz.trackerplatform.habit.dto.HabitStatusDTO;
+import hr.tvz.trackerplatform.habit.model.Habit;
+import hr.tvz.trackerplatform.habit.model.HabitCompletion;
+import hr.tvz.trackerplatform.habit.model.HabitFrequency;
+import hr.tvz.trackerplatform.habit.repository.HabitCompletionRepository;
+import hr.tvz.trackerplatform.habit.repository.HabitFrequencyRepository;
+import hr.tvz.trackerplatform.habit.repository.HabitRepository;
+import hr.tvz.trackerplatform.habit.service.HabitServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
