@@ -40,10 +40,10 @@ public class JournalEntryController {
                 .status(HttpStatus.CREATED)
                 .body(createdJournalEntry);
     }
-    @DeleteMapping("/date/{date}")
+    @DeleteMapping("/{date}")
     public ResponseEntity<Void> deleteByDate(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         try {
-            journalEntryService.deleteByDate(date);
+            journalEntryService.delete(date);
             return ResponseEntity.noContent().build();
         }
         catch (Exception e) {

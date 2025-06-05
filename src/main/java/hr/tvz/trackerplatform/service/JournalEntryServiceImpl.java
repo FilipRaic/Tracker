@@ -36,8 +36,9 @@ public class JournalEntryServiceImpl implements JournalEntryService{
     }
 
     @Override
-    public void deleteByDate(LocalDate date) {
-        journalEntryRepository.deleteByDate(date);
+    public void delete(LocalDate date) {
+        Long id=journalEntryRepository.findByDate(date).getId();
+        journalEntryRepository.deleteById(id);
     }
 
     @Override

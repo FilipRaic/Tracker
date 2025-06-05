@@ -9,7 +9,7 @@ public interface JournalEntryService {
     List<JournalEntryDTO> findAll();
     JournalEntryDTO create(JournalEntryDTO journalEntryDTO);
     JournalEntryDTO findByDate(LocalDate date);
-    void deleteByDate(LocalDate date);
+    void delete(LocalDate date);
 
     JournalEntryDTO update(JournalEntryDTO journalEntryDTO,LocalDate date);
 }
