@@ -1,16 +1,17 @@
 package hr.tvz.trackerplatform.shared.exception;
 
 import lombok.AllArgsConstructor;
-import lombok.ToString;
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-@ToString
+@Getter
 @AllArgsConstructor
 public class TrackerException extends RuntimeException {
 
     private final ErrorMessage errorMessage;
 
-    public String getErrorMessage() {
+    @Override
+    public String getMessage() {
         return errorMessage.getMessage();
     }
 
