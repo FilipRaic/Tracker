@@ -39,15 +39,12 @@ class HabitServiceTest {
 
     @Test
     void testFindAllReturnsDTOs() {
-        // given
         HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
         Habit habit = new Habit(1L, "Run", LocalDate.now(), "Daily jogging", dailyFrequency);
         when(habitRepository.findAll()).thenReturn(List.of(habit));
 
-        // when
         List<HabitDTO> result = habitService.findAll();
 
-        // then
         assertEquals(1, result.size());
         assertEquals("Run", result.getFirst().getName());
         assertEquals(habit.getHabitFrequency().getName(), result.getFirst().getFrequency());
@@ -55,7 +52,6 @@ class HabitServiceTest {
 
     @Test
     void testCreateHabit() {
-        // given
         LocalDate startDate = LocalDate.now();
         HabitFrequency weeklyFrequency = new HabitFrequency(1, "week");
         HabitDTO dto = new HabitDTO(1L, "Read", startDate, weeklyFrequency.getName(), "Book");
@@ -63,16 +59,13 @@ class HabitServiceTest {
         when(habitFrequencyRepository.findByName(weeklyFrequency.getName())).thenReturn(Optional.of(weeklyFrequency));
         when(habitRepository.save(any())).thenReturn(habit);
 
-        // when
         HabitDTO result = habitService.create(dto);
 
-        // then
         assertEquals(dto, result);
     }
 
     @Test
     void findCurrentHabitsWithStatus() {
-        // given
         LocalDate startDate = LocalDate.now();
         LocalDate completionDate = startDate.plusDays(1);
         HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
@@ -94,10 +87,8 @@ class HabitServiceTest {
         when(habitCompletionRepository.findFirstByHabitAndCompletionDateGreaterThanEqualOrderByCompletionDateAsc(
                 eq(thirdHabit), any())).thenReturn(Optional.of(thirdHabitCompletion));
 
-        // when
         List<HabitStatusDTO> currentHabitsWithStatus = habitService.findCurrentHabitsWithStatus();
 
-        // then
         assertEquals(3, currentHabitsWithStatus.size());
         assertEquals(firstHabitStatusDTO, currentHabitsWithStatus.get(0));
         assertEquals(secondHabitStatusDTO, currentHabitsWithStatus.get(1));
@@ -106,7 +97,6 @@ class HabitServiceTest {
 
     @Test
     void changeHabitStatus() {
-        // given
         Long habitId = 1L;
         LocalDate today = LocalDate.now();
         LocalDate completionDate = today.plusDays(1);
@@ -120,25 +110,20 @@ class HabitServiceTest {
         when(habitCompletionRepository.save(changedHabitCompletion)).thenReturn(changedHabitCompletion);
         HabitStatusDTO expectedStatus = buildHabitStatusDTO(habit, completionDate, true);
 
-        // when
         HabitStatusDTO habitStatusDTO = habitService.changeHabitStatus(habitId);
 
-        // then
         assertEquals(expectedStatus, habitStatusDTO);
     }
 
     @Test
     void deleteHabit() {
-        // given
         Long habitId = 1L;
         HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
         Habit habit = new Habit(habitId, "Workout", LocalDate.now(), null, dailyFrequency);
         when(habitRepository.findById(habitId)).thenReturn(Optional.of(habit));
 
-        // when
         habitService.deleteHabit(habitId);
 
-        // then
         verify(habitRepository).findById(habitId);
         verify(habitCompletionRepository).deleteByHabit(habit);
         verify(habitRepository).delete(habit);

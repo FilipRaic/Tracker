@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -42,25 +43,26 @@ public class DailyCheckScheduler {
         log.info("Generating daily check");
 
         try {
-            DailyCheck checkIn = generateDailyCheck();
-            emailService.sendDailyCheckEmail(checkIn);
+            Optional<DailyCheck> dailyCheck = generateDailyCheck();
+            dailyCheck.ifPresent(emailService::sendDailyCheckEmail);
         } catch (Exception e) {
             log.error("Failed to generate or send daily check", e);
         }
     }
 
-    private DailyCheck generateDailyCheck() {
+    private Optional<DailyCheck> generateDailyCheck() {
         LocalDate today = LocalDate.now();
 
         if (dailyCheckRepository.existsByCheckInDate(today)) {
             log.info("Daily check already exists for this date {}", today);
 
-            return dailyCheckRepository.findByCheckInDate(today).getFirst();
+            return Optional.empty();
         }
 
         List<Question> randomQuestions = questionRepository.findRandomActiveQuestions(NUMBER_OF_QUESTIONS);
         if (randomQuestions.size() < NUMBER_OF_QUESTIONS) {
             log.warn("Not enough questions available. Found only {} questions.", randomQuestions.size());
+            return Optional.empty();
         }
 
         DailyCheck dailyCheck = DailyCheck.builder()
@@ -73,7 +75,7 @@ public class DailyCheckScheduler {
         DailyCheck savedDailyCheck = dailyCheckRepository.saveAndFlush(dailyCheck);
         log.info("Generated daily check with UUID {}", savedDailyCheck.getUuid());
 
-        return savedDailyCheck;
+        return Optional.of(savedDailyCheck);
     }
 
     private List<DailyQuestion> mapToDailyQuestions(List<Question> questions) {

@@ -1,7 +1,8 @@
 package hr.tvz.trackerplatform.shared.service;
 
 import hr.tvz.trackerplatform.daily_check.model.DailyCheck;
-import jakarta.mail.MessagingException;
+import hr.tvz.trackerplatform.shared.exception.ErrorMessage;
+import hr.tvz.trackerplatform.shared.exception.TrackerException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,15 +41,16 @@ public class EmailService {
 
             Context context = new Context();
             context.setVariable("firstName", userFirstName);
-            context.setVariable("dailyCheckUrl", frontendUrl + "/check-in/" + dailyCheck.getUuid());
+            context.setVariable("dailyCheckUrl", frontendUrl + "/daily-check/" + dailyCheck.getUuid());
 
             String emailContent = templateEngine.process("daily-check-email", context);
             helper.setText(emailContent, true);
 
             mailSender.send(message);
             log.info("Daily check email sent to user: {}", userEmail);
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             log.error("Failed to send daily check email to user: {}", userEmail, e);
+            throw new TrackerException(ErrorMessage.ERROR_GENERATING_EMAIL);
         }
     }
 }

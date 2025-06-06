@@ -1,6 +1,7 @@
 package hr.tvz.trackerplatform.service;
 
 import hr.tvz.trackerplatform.daily_check.dto.DailyCheckDTO;
+import hr.tvz.trackerplatform.daily_check.dto.DailyCheckSubmitDTO;
 import hr.tvz.trackerplatform.daily_check.dto.DailyQuestionDTO;
 import hr.tvz.trackerplatform.daily_check.model.DailyCheck;
 import hr.tvz.trackerplatform.daily_check.model.DailyQuestion;
@@ -13,17 +14,20 @@ import hr.tvz.trackerplatform.shared.mapper.Mapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -91,5 +95,93 @@ class DailyCheckServiceTest {
         assertThatThrownBy(() -> dailyCheckService.getDailyCheckByUuid(uuid))
                 .isInstanceOf(TrackerException.class)
                 .hasMessage(ErrorMessage.DAILY_CHECK_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void getDailyCheckByUuid_shouldThrowException_whenAlreadyCompleted() {
+        UUID uuid = UUID.randomUUID();
+        DailyCheck completedDailyCheck = DailyCheck.builder()
+                .id(1L)
+                .uuid(uuid)
+                .checkInDate(LocalDate.now())
+                .questions(List.of())
+                .completed(true)
+                .build();
+
+        when(dailyCheckRepository.findByUuid(uuid)).thenReturn(Optional.of(completedDailyCheck));
+
+        assertThatThrownBy(() -> dailyCheckService.getDailyCheckByUuid(uuid))
+                .isInstanceOf(TrackerException.class)
+                .hasMessage(ErrorMessage.DAILY_CHECK_ALREADY_SUBMITTED.getMessage());
+    }
+
+    @Test
+    void submitDailyCheck_shouldSubmitSuccessfully() {
+        Long dailyCheckId = 1L;
+        List<DailyQuestionDTO> questionDTOs = List.of(
+                DailyQuestionDTO.builder().id(1L).content("Question 1").category(QuestionCategory.MENTAL).score(5).build(),
+                DailyQuestionDTO.builder().id(2L).content("Question 2").category(QuestionCategory.EMOTIONAL).score(4).build()
+        );
+        DailyCheckSubmitDTO submitDTO = DailyCheckSubmitDTO.builder()
+                .id(dailyCheckId)
+                .questions(questionDTOs)
+                .build();
+
+        List<DailyQuestion> mappedQuestions = List.of(
+                DailyQuestion.builder().id(1L).content("Question 1").category(QuestionCategory.MENTAL).score(5).build(),
+                DailyQuestion.builder().id(2L).content("Question 2").category(QuestionCategory.EMOTIONAL).score(4).build()
+        );
+
+        when(dailyCheckRepository.findById(dailyCheckId)).thenReturn(Optional.of(dailyCheck));
+        when(mapper.mapList(questionDTOs, DailyQuestion.class)).thenReturn(mappedQuestions);
+
+        dailyCheckService.submitDailyCheck(submitDTO);
+
+        ArgumentCaptor<DailyCheck> dailyCheckCaptor = ArgumentCaptor.forClass(DailyCheck.class);
+        verify(dailyCheckRepository).save(dailyCheckCaptor.capture());
+
+        DailyCheck savedDailyCheck = dailyCheckCaptor.getValue();
+        assertThat(savedDailyCheck.isCompleted()).isTrue();
+        assertThat(savedDailyCheck.getCompletedAt()).isNotNull();
+        assertThat(savedDailyCheck.getQuestions()).isEqualTo(mappedQuestions);
+    }
+
+    @Test
+    void submitDailyCheck_shouldThrowException_whenDailyCheckNotFound() {
+        Long dailyCheckId = 999L;
+        DailyCheckSubmitDTO submitDTO = DailyCheckSubmitDTO.builder()
+                .id(dailyCheckId)
+                .questions(List.of())
+                .build();
+
+        when(dailyCheckRepository.findById(dailyCheckId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> dailyCheckService.submitDailyCheck(submitDTO))
+                .isInstanceOf(TrackerException.class)
+                .hasMessage(ErrorMessage.DAILY_CHECK_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void submitDailyCheck_shouldThrowException_whenAlreadySubmitted() {
+        Long dailyCheckId = 1L;
+        DailyCheckSubmitDTO submitDTO = DailyCheckSubmitDTO.builder()
+                .id(dailyCheckId)
+                .questions(List.of())
+                .build();
+
+        DailyCheck completedDailyCheck = DailyCheck.builder()
+                .id(dailyCheckId)
+                .uuid(UUID.randomUUID())
+                .checkInDate(LocalDate.now())
+                .questions(List.of())
+                .completed(true)
+                .completedAt(LocalDateTime.now())
+                .build();
+
+        when(dailyCheckRepository.findById(dailyCheckId)).thenReturn(Optional.of(completedDailyCheck));
+
+        assertThatThrownBy(() -> dailyCheckService.submitDailyCheck(submitDTO))
+                .isInstanceOf(TrackerException.class)
+                .hasMessage(ErrorMessage.DAILY_CHECK_ALREADY_SUBMITTED.getMessage());
     }
 }

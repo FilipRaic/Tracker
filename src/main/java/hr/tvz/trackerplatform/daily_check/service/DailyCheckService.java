@@ -27,6 +27,10 @@ public class DailyCheckService {
         DailyCheck dailyCheck = dailyCheckRepository.findByUuid(uuid)
                 .orElseThrow(() -> new TrackerException(ErrorMessage.DAILY_CHECK_NOT_FOUND));
 
+        if (dailyCheck.isCompleted()) {
+            throw new TrackerException(ErrorMessage.DAILY_CHECK_ALREADY_SUBMITTED);
+        }
+
         return mapper.map(dailyCheck, DailyCheckDTO.class);
     }
 
