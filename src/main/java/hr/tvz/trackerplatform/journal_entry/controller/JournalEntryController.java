@@ -43,7 +43,7 @@ public class JournalEntryController {
         try {
             journalEntryService.delete(date);
             return ResponseEntity.noContent().build();
-        } catch (Exception e) {
+        } catch (Exception _) {
             return ResponseEntity.notFound().build();
         }
     }

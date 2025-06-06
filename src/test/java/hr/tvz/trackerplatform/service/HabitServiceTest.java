@@ -26,7 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class HabitServiceTest {
+class HabitServiceTest {
     @Mock
     private HabitRepository habitRepository;
     @Mock
@@ -49,8 +49,8 @@ public class HabitServiceTest {
 
         // then
         assertEquals(1, result.size());
-        assertEquals("Run", result.get(0).getName());
-        assertEquals(habit.getHabitFrequency().getName(), result.get(0).getFrequency());
+        assertEquals("Run", result.getFirst().getName());
+        assertEquals(habit.getHabitFrequency().getName(), result.getFirst().getFrequency());
     }
 
     @Test
@@ -60,7 +60,7 @@ public class HabitServiceTest {
         HabitFrequency weeklyFrequency = new HabitFrequency(1, "week");
         HabitDTO dto = new HabitDTO(1L, "Read", startDate, weeklyFrequency.getName(), "Book");
         Habit habit = new Habit(1L, "Read", startDate, "Book", weeklyFrequency);
-        when(habitFrequencyRepository.findByName(eq(weeklyFrequency.getName()))).thenReturn(Optional.of(weeklyFrequency));
+        when(habitFrequencyRepository.findByName(weeklyFrequency.getName())).thenReturn(Optional.of(weeklyFrequency));
         when(habitRepository.save(any())).thenReturn(habit);
 
         // when
@@ -114,7 +114,7 @@ public class HabitServiceTest {
         Habit habit = new Habit(habitId, "Workout", today, null, dailyFrequency);
         HabitCompletion habitCompletion = new HabitCompletion(1L, completionDate, false, habit);
         HabitCompletion changedHabitCompletion = new HabitCompletion(1L, completionDate, true, habit);
-        when(habitRepository.findById(eq(habitId))).thenReturn(Optional.of(habit));
+        when(habitRepository.findById(habitId)).thenReturn(Optional.of(habit));
         when(habitCompletionRepository.findFirstByHabitAndCompletionDateGreaterThanEqualOrderByCompletionDateAsc(
                 eq(habit), any())).thenReturn(Optional.of(habitCompletion));
         when(habitCompletionRepository.save(changedHabitCompletion)).thenReturn(changedHabitCompletion);
@@ -133,7 +133,7 @@ public class HabitServiceTest {
         Long habitId = 1L;
         HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
         Habit habit = new Habit(habitId, "Workout", LocalDate.now(), null, dailyFrequency);
-        when(habitRepository.findById(eq(habitId))).thenReturn(Optional.of(habit));
+        when(habitRepository.findById(habitId)).thenReturn(Optional.of(habit));
 
         // when
         habitService.deleteHabit(habitId);
