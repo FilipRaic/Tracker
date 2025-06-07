@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Daily Well-Being Check-In</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background-color: #229ACA;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+
+        .content {
+            padding: 20px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: #229ACA;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #777;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Daily Well-Being Check-In</h1>
+</div>
+<div class="content">
+    <p>Hello <span th:text="${firstName}">User</span>,</p>
+
+    <p>It's time for your daily well-being check-in! Taking a few moments to reflect on your well-being can help you
+        stay mindful of your mental and emotional health.</p>
+
+    <p>Today's check-in includes questions about your well-being. Your responses will help you track your progress over
+        time.</p>
+
+    <p>Click the button below to complete your daily check-in:</p>
+
+    <a th:href="${dailyCheckUrl}" class="button">Complete Your Check-In</a>
+
+    <p>This link will take you to a short questionnaire that should take less than a minute to complete.</p>
+
+    <p>Thank you for prioritizing your well-being!</p>
+</div>
+<div class="footer">
+    <p>This is an automated message. Please do not reply to this email.</p>
+    <p>&copy; 2025 Tracker Platform. All rights reserved.</p>
+</div>
+</body>
+</html>

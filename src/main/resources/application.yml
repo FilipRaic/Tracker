@@ -2,6 +2,20 @@ spring:
   application:
     name: tracker-platform
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:your-email@gmail.com}
+    password: ${MAIL_PASSWORD:your-app-password}
+    from: ${MAIL_FROM:${MAIL_USERNAME:your-email@gmail.com}}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
   datasource:
     driver-class-name: org.postgresql.Driver
     tomcat:
@@ -23,8 +37,15 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: false
+
+  flyway:
+    enabled: true
+    create-schemas: true
+    default-schema: public
+    schemas: public
+    validate-migration-naming: true
 
   sql:
     init:
@@ -40,13 +61,6 @@ spring:
       syntaxHighlight:
         activated: false
 
-logging:
-  level:
-    org:
-      springframework:
-        web: DEBUG
-        socket: DEBUG
-
 server:
   port: 8080
   error:
@@ -58,3 +72,7 @@ application:
     jwt:
       secret-key: ZjMzYzM4NzYzMTg0OWE4ZTY5M2ZlYjZhMDIyMjA4ZGQzYTNlZmQ4ZmU0MzU3ZThhNTc1Yzg1NTZiYzEyY2VlNzM5ZGM2MjdkMGY5NWMyY2Y5NmRiMDg3ZGFkOTM3NWEwODA5ODJjZWQ3NGI0MDdiMzZmYzlhOGU0NTEyODFmYzg=
       expiration: 3600000
+
+scheduler:
+  cron:
+    daily-check: "0 0 8 * * ?"

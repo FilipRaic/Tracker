@@ -4,7 +4,28 @@ spring:
     username: postgres
     password: postgres
 
+  mail:
+    host: localhost
+    port: 1026
+    username: test
+    password: test
+    from: noreply@trackerplatform.com
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+            required: false
+
 application:
   security:
     jwt:
       expiration: 28800000
+
+frontend:
+  url: http://localhost:4200
+
+scheduler:
+  cron:
+    daily-check: "0 * * * * ?"

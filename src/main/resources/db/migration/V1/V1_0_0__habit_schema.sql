@@ -1,18 +1,19 @@
-create table if not exists public.habit_frequency
+CREATE SEQUENCE IF NOT EXISTS seq_habit_frequency_generator START WITH 1 INCREMENT BY 50 CACHE 1;
+
+CREATE TABLE IF NOT EXISTS public.habit_frequency
 (
-    id              int primary key,
-    name            varchar(100) not null
+    id   BIGINT PRIMARY KEY DEFAULT NEXTVAL('seq_habit_frequency_generator'),
+    name VARCHAR(100) NOT NULL
 );
 
--- TODO: Add user_id as part of later ticket
-create table if not exists public.habit
+CREATE SEQUENCE IF NOT EXISTS seq_habit_generator START WITH 1 INCREMENT BY 50 CACHE 1;
+
+CREATE TABLE IF NOT EXISTS public.habit
 (
-    id              bigint primary key,
-    name            varchar(100) not null,
-    frequency_id    int not null,
-    begin           date not null,
-    description     varchar(255),
-    constraint fk_habit_habit_frequency
-        foreign key (frequency_id)
-        references habit_frequency (id)
+    id           BIGINT PRIMARY KEY DEFAULT NEXTVAL('seq_habit_generator'),
+    name         VARCHAR(100) NOT NULL,
+    frequency_id INT          NOT NULL,
+    begin        DATE         NOT NULL,
+    description  VARCHAR(255),
+    CONSTRAINT fk_habit_habit_frequency FOREIGN KEY (frequency_id) REFERENCES habit_frequency (id)
 );
