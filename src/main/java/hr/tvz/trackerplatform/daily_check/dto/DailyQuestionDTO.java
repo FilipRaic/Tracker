@@ -14,5 +14,7 @@ public class DailyQuestionDTO {
     private Long id;
     private QuestionCategory category;
     private String content;
+    private String contentDe;
+    private String contentHr;
     private Integer score;
 }
