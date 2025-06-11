@@ -91,6 +91,8 @@ public class DailyCheckScheduler {
                         DailyQuestion.builder()
                                 .category(question.getCategory())
                                 .content(question.getContent())
+                                .contentDe(question.getContentDe())
+                                .contentHr(question.getContentHr())
                                 .build())
                 .toList());
     }
