@@ -25,3 +25,11 @@ CREATE TABLE IF NOT EXISTS refresh_token
 
 CREATE INDEX IF NOT EXISTS ix_users_email ON application_user (email);
 CREATE INDEX IF NOT EXISTS ix_refresh_token_token ON refresh_token (token);
+
+ALTER TABLE IF EXISTS daily_check
+    ADD COLUMN IF NOT EXISTS user_id BIGINT NOT NULL DEFAULT 0;
+
+ALTER TABLE IF EXISTS daily_check
+    ADD CONSTRAINT FK_daily_check_user FOREIGN KEY (user_id) REFERENCES application_user;
+
+CREATE INDEX IF NOT EXISTS IX_daily_check_user ON daily_check (user_id);

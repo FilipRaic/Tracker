@@ -6,6 +6,8 @@ import hr.tvz.trackerplatform.daily_check.repository.DailyCheckRepository;
 import hr.tvz.trackerplatform.question.model.Question;
 import hr.tvz.trackerplatform.question.repository.QuestionRepository;
 import hr.tvz.trackerplatform.shared.service.EmailService;
+import hr.tvz.trackerplatform.user.model.User;
+import hr.tvz.trackerplatform.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,6 +28,7 @@ public class DailyCheckScheduler {
     private static final int NUMBER_OF_QUESTIONS = 4;
 
     private final EmailService emailService;
+    private final UserRepository userRepository;
     private final QuestionRepository questionRepository;
     private final DailyCheckRepository dailyCheckRepository;
 
@@ -34,28 +37,30 @@ public class DailyCheckScheduler {
     public void scheduleDailyChecks() {
         log.info("Starting scheduled task to generate and send daily checks");
 
-        generateAndSendDailyChecks();
+        List<User> users = userRepository.findAllWithoutDailyCheckForDate(LocalDate.now());
+
+        for (User user : users) {
+            generateAndSendDailyCheck(user);
+        }
 
         log.info("Completed scheduled task to generate and send daily checks");
     }
 
-    private void generateAndSendDailyChecks() {
+    private void generateAndSendDailyCheck(User user) {
         log.info("Generating daily check");
 
         try {
-            Optional<DailyCheck> dailyCheck = generateDailyCheck();
-            dailyCheck.ifPresent(emailService::sendDailyCheckEmail);
+            Optional<DailyCheck> dailyCheck = generateDailyCheck(user);
+            dailyCheck.ifPresent(dc -> emailService.sendDailyCheckEmail(dc, user));
         } catch (Exception e) {
             log.error("Failed to generate or send daily check", e);
         }
     }
 
-    private Optional<DailyCheck> generateDailyCheck() {
+    private Optional<DailyCheck> generateDailyCheck(User user) {
         LocalDate today = LocalDate.now();
 
-        if (dailyCheckRepository.existsByCheckInDate(today)) {
-            log.info("Daily check already exists for this date {}", today);
-
+        if (dailyCheckRepository.existsByCheckInDateAndUser(LocalDate.now(), user)) {
             return Optional.empty();
         }
 
@@ -70,6 +75,7 @@ public class DailyCheckScheduler {
                 .createdAt(LocalDateTime.now())
                 .questions(mapToDailyQuestions(randomQuestions))
                 .completed(false)
+                .user(user)
                 .build();
 
         DailyCheck savedDailyCheck = dailyCheckRepository.saveAndFlush(dailyCheck);

@@ -56,6 +56,10 @@ public class JournalEntryServiceImpl implements JournalEntryService {
     }
 
     private JournalEntryDTO mapToJournalEntryDTO(JournalEntry journalEntry) {
+        if (journalEntry == null) {
+            return null;
+        }
+
         return JournalEntryDTO.builder()
                 .date(journalEntry.getDate())
                 .description(journalEntry.getDescription())

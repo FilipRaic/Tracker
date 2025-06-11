@@ -19,4 +19,6 @@ public class DailyCheckDTO {
     private List<DailyQuestionDTO> questions = new ArrayList<>();
 
     private boolean completed;
+
+    private String userFirstName;
 }
