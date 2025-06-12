@@ -39,7 +39,7 @@ public class UserService {
             throw new TrackerException(ErrorMessage.PASSWORD_TOO_SHORT);
         }
 
-        if (!request.getPassword().matches("^(?=.*[0-9])(?=.*[!@#$%^&*]).*$")) {
+        if (!request.getPassword().matches("^(?=.*[0-9])(?=.*[!@#$%^&*-]).*$")) {
             throw new TrackerException(ErrorMessage.PASSWORD_TOO_WEAK);
         }
 
