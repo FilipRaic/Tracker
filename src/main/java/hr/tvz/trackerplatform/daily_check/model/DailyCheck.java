@@ -2,6 +2,7 @@ package hr.tvz.trackerplatform.daily_check.model;
 
 import hr.tvz.trackerplatform.shared.exception.ErrorMessage;
 import hr.tvz.trackerplatform.shared.exception.TrackerException;
+import hr.tvz.trackerplatform.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,7 +15,8 @@ import java.util.UUID;
 
 @Entity
 @Table(
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"check_in_date"}, name = "uk_daily_check_date")}
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"check_in_date"}, name = "uk_daily_check_date")},
+        indexes = {@Index(columnList = "user_id", name = "IX_daily_check_user")}
 )
 @Getter
 @Builder
@@ -32,6 +34,10 @@ public class DailyCheck {
     @Builder.Default
     @Column(name = "uuid", nullable = false)
     private UUID uuid = UUID.randomUUID();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_daily_check_user"))
+    private User user;
 
     @Builder.Default
     @Column(name = "check_in_date", nullable = false, unique = true)

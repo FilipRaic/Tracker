@@ -5,6 +5,10 @@ import hr.tvz.trackerplatform.daily_check.repository.DailyCheckRepository;
 import hr.tvz.trackerplatform.question.model.Question;
 import hr.tvz.trackerplatform.question.repository.QuestionRepository;
 import hr.tvz.trackerplatform.shared.service.EmailService;
+import hr.tvz.trackerplatform.user.enums.Role;
+import hr.tvz.trackerplatform.user.model.User;
+import hr.tvz.trackerplatform.user.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -22,22 +26,38 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class DailyCheckSchedulerTest {
 
+    private static User user;
+
     @Mock
     private EmailService emailService;
-
+    @Mock
+    private UserRepository userRepository;
     @Mock
     private QuestionRepository questionRepository;
-
     @Mock
     private DailyCheckRepository dailyCheckRepository;
 
     @InjectMocks
     private DailyCheckScheduler dailyCheckScheduler;
 
+    @BeforeEach
+    void setUp() {
+        user = User.builder()
+                .id(1L)
+                .firstName("Davis")
+                .lastName("Davis")
+                .email("davis@mail.com")
+                .role(Role.USER)
+                .build();
+
+        when(userRepository.findAllWithoutDailyCheckForDate(LocalDate.now())).thenReturn(List.of(user));
+    }
+
     @Test
     void scheduleDailyChecks_shouldGenerateAndSendDailyCheck() {
         LocalDate today = LocalDate.now();
-        when(dailyCheckRepository.existsByCheckInDate(today)).thenReturn(false);
+
+        when(dailyCheckRepository.existsByCheckInDateAndUser(today, user)).thenReturn(false);
 
         List<Question> randomQuestions = List.of(
                 Question.builder().id(1L).content("Question 1").category(hr.tvz.trackerplatform.question.enums.QuestionCategory.MENTAL).build(),
@@ -59,7 +79,7 @@ class DailyCheckSchedulerTest {
 
         ArgumentCaptor<DailyCheck> dailyCheckCaptor = ArgumentCaptor.forClass(DailyCheck.class);
         verify(dailyCheckRepository).saveAndFlush(dailyCheckCaptor.capture());
-        verify(emailService).sendDailyCheckEmail(savedDailyCheck);
+        verify(emailService).sendDailyCheckEmail(savedDailyCheck, user);
 
         DailyCheck capturedDailyCheck = dailyCheckCaptor.getValue();
         assertThat(capturedDailyCheck.getCheckInDate()).isEqualTo(today);
@@ -70,19 +90,19 @@ class DailyCheckSchedulerTest {
     @Test
     void scheduleDailyChecks_shouldNotGenerateDailyCheck_whenAlreadyExistsForToday() {
         LocalDate today = LocalDate.now();
-        when(dailyCheckRepository.existsByCheckInDate(today)).thenReturn(true);
+        when(dailyCheckRepository.existsByCheckInDateAndUser(today, user)).thenReturn(true);
 
         dailyCheckScheduler.scheduleDailyChecks();
 
         verify(questionRepository, never()).findRandomActiveQuestions(anyInt());
         verify(dailyCheckRepository, never()).saveAndFlush(any(DailyCheck.class));
-        verify(emailService, never()).sendDailyCheckEmail(any(DailyCheck.class));
+        verify(emailService, never()).sendDailyCheckEmail(any(DailyCheck.class), eq(user));
     }
 
     @Test
     void scheduleDailyChecks_shouldNotGenerateDailyCheck_whenNotEnoughQuestionsAvailable() {
         LocalDate today = LocalDate.now();
-        when(dailyCheckRepository.existsByCheckInDate(today)).thenReturn(false);
+        when(dailyCheckRepository.existsByCheckInDateAndUser(today, user)).thenReturn(false);
 
         List<Question> randomQuestions = List.of(
                 Question.builder().id(1L).content("Question 1").category(hr.tvz.trackerplatform.question.enums.QuestionCategory.MENTAL).build(),
@@ -93,18 +113,18 @@ class DailyCheckSchedulerTest {
         dailyCheckScheduler.scheduleDailyChecks();
 
         verify(dailyCheckRepository, never()).saveAndFlush(any(DailyCheck.class));
-        verify(emailService, never()).sendDailyCheckEmail(any(DailyCheck.class));
+        verify(emailService, never()).sendDailyCheckEmail(any(DailyCheck.class), eq(user));
     }
 
     @Test
     void scheduleDailyChecks_shouldHandleExceptions() {
         LocalDate today = LocalDate.now();
-        when(dailyCheckRepository.existsByCheckInDate(today)).thenReturn(false);
+        when(dailyCheckRepository.existsByCheckInDateAndUser(today, user)).thenReturn(false);
         when(questionRepository.findRandomActiveQuestions(4)).thenThrow(new RuntimeException("Test exception"));
 
         dailyCheckScheduler.scheduleDailyChecks();
 
         verify(dailyCheckRepository, never()).saveAndFlush(any(DailyCheck.class));
-        verify(emailService, never()).sendDailyCheckEmail(any(DailyCheck.class));
+        verify(emailService, never()).sendDailyCheckEmail(any(DailyCheck.class), eq(user));
     }
 }
