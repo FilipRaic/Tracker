@@ -6,8 +6,8 @@ import hr.tvz.trackerplatform.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -45,10 +45,10 @@ public class DailyCheck {
 
     @Builder.Default
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    private Instant createdAt = Instant.now();
 
     @Column(name = "completed_at")
-    private LocalDateTime completedAt;
+    private Instant completedAt;
 
     @Builder.Default
     @OneToMany(targetEntity = DailyQuestion.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -83,7 +83,7 @@ public class DailyCheck {
         }
 
         this.questions = new ArrayList<>(dailyQuestions);
-        this.completedAt = LocalDateTime.now();
+        this.completedAt = Instant.now();
         this.completed = true;
     }
 }

@@ -1,4 +1,4 @@
-package hr.tvz.trackerplatform.wellbeingTips.dto;
+package hr.tvz.trackerplatform.wellbeing_tip.dto;
 
 import hr.tvz.trackerplatform.question.enums.QuestionCategory;
 import jakarta.persistence.Column;
