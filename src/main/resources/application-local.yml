@@ -18,11 +18,6 @@ spring:
             enable: false
             required: false
 
-application:
-  security:
-    jwt:
-      expiration: 28800000
-
 frontend:
   url: http://localhost:4200
 

@@ -51,4 +51,28 @@ public class EmailService {
             throw new TrackerException(ErrorMessage.ERROR_GENERATING_EMAIL);
         }
     }
+
+    public void sendResetPasswordEmail(User user, String token) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(user.getEmail());
+            helper.setSubject("Reset password for Tracker Platform");
+
+            Context context = new Context();
+            context.setVariable("firstName", user.getFirstName());
+            context.setVariable("resetPasswordUrl", frontendUrl + "/reset-password/" + token);
+
+            String emailContent = templateEngine.process("reset-password-email", context);
+            helper.setText(emailContent, true);
+
+            mailSender.send(message);
+            log.info("Reset password email sent to user with ID: {}", user.getId());
+        } catch (Exception e) {
+            log.error("Failed to send reset password to user with ID: {}", user.getId(), e);
+            throw new TrackerException(ErrorMessage.ERROR_GENERATING_EMAIL);
+        }
+    }
 }

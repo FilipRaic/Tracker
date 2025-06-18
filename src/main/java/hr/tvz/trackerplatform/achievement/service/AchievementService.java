@@ -4,39 +4,37 @@ import hr.tvz.trackerplatform.achievement.model.Achievement;
 import hr.tvz.trackerplatform.achievement.repository.AchievementRepository;
 import hr.tvz.trackerplatform.journal_entry.dto.JournalEntryDTO;
 import hr.tvz.trackerplatform.journal_entry.service.JournalEntryService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AchievementService {
 
-    AchievementRepository achievementRepository;
-    JournalEntryService journalEntryService;
-    public List<Achievement> checkAchievements(){
-    List<Achievement> achievements=new ArrayList<>();
-        if(checkWelcome()){
-            achievements.add(achievementRepository.findByName("Welcome"));
+    private final AchievementRepository achievementRepository;
+    private final JournalEntryService journalEntryService;
+
+    public List<Achievement> checkAchievements() {
+        List<Achievement> achievements = new ArrayList<>();
+
+        Optional<Achievement> welcomeAchievement = achievementRepository.findByName("Welcome");
+        welcomeAchievement.ifPresent(achievements::add);
+
+        if (checkFirstPage()) {
+            Optional<Achievement> firstPageAchievement = achievementRepository.findByName("First page");
+            firstPageAchievement.ifPresent(achievements::add);
         }
-        if(checkFirstPage()){
-            achievements.add(achievementRepository.findByName("First page"));
-        }
+
         return achievements;
     }
-    private Boolean checkWelcome(){
-        return true;
-    }
-    private Boolean checkFirstPage(){
-        List<JournalEntryDTO> journalEntryDTOS=journalEntryService.findAll();
-        if (journalEntryDTOS.size()==0){
-            return false;
-        }
-        else {
-            return true;
-        }
+
+    private boolean checkFirstPage() {
+        List<JournalEntryDTO> journalEntryDTOS = journalEntryService.findAll();
+
+        return !journalEntryDTOS.isEmpty();
     }
 }

@@ -71,7 +71,9 @@ application:
   security:
     jwt:
       secret-key: ZjMzYzM4NzYzMTg0OWE4ZTY5M2ZlYjZhMDIyMjA4ZGQzYTNlZmQ4ZmU0MzU3ZThhNTc1Yzg1NTZiYzEyY2VlNzM5ZGM2MjdkMGY5NWMyY2Y5NmRiMDg3ZGFkOTM3NWEwODA5ODJjZWQ3NGI0MDdiMzZmYzlhOGU0NTEyODFmYzg=
-      expiration: 3600000
+      access-token-expiration: 300000
+      refresh-token-expiration: 28800000
+      reset-password-token-expiration: 900000
 
 scheduler:
   cron:

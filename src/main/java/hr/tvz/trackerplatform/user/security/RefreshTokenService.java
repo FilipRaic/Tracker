@@ -6,6 +6,7 @@ import hr.tvz.trackerplatform.user.model.RefreshToken;
 import hr.tvz.trackerplatform.user.model.User;
 import hr.tvz.trackerplatform.user.repository.RefreshTokenRepository;
 import hr.tvz.trackerplatform.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,34 +16,36 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class RefreshTokenService {
 
-    @Value("${application.security.jwt.expiration}")
-    private Long refreshTokenDurationMs;
+    @Value("${application.security.jwt.refresh-token-expiration}")
+    private Long refreshTokenExpiration;
 
-    private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
-    public RefreshTokenService(RefreshTokenRepository refreshTokenRepository, UserRepository userRepository) {
-        this.refreshTokenRepository = refreshTokenRepository;
-        this.userRepository = userRepository;
+    @Transactional(readOnly = true)
+    public Optional<RefreshToken> findByUserId(Long userId) {
+        return refreshTokenRepository.findByUserId(userId);
     }
 
-    public Optional<RefreshToken> findByToken(String token) {
-        return refreshTokenRepository.findByToken(token);
-    }
+    @Transactional
+    public void createRefreshToken(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new TrackerException(ErrorMessage.USER_NOT_FOUND));
 
-    public RefreshToken createRefreshToken(Long userId) {
         RefreshToken refreshToken = RefreshToken.builder()
-                .user(userRepository.findById(userId)
-                        .orElseThrow(() -> new TrackerException(ErrorMessage.USER_NOT_FOUND)))
+                .user(user)
                 .token(UUID.randomUUID().toString())
-                .expiryDate(Instant.now().plusMillis(refreshTokenDurationMs * 7)) // Refresh token valid for 7 times longer than access token
+                .expiryDate(Instant.now().plusMillis(refreshTokenExpiration))
                 .build();
 
-        return refreshTokenRepository.save(refreshToken);
+        refreshTokenRepository.deleteAllByUserId(userId);
+        refreshTokenRepository.save(refreshToken);
     }
 
+    @Transactional
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.isExpired()) {
             refreshTokenRepository.delete(token);
@@ -50,11 +53,5 @@ public class RefreshTokenService {
         }
 
         return token;
-    }
-
-    @Transactional
-    public int deleteByUserId(Long userId) {
-        return refreshTokenRepository.deleteByUser(userRepository.findById(userId)
-                .orElseThrow(() -> new TrackerException(ErrorMessage.USER_NOT_FOUND)));
     }
 }

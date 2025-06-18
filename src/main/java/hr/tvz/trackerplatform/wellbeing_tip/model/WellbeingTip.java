@@ -1,4 +1,4 @@
-package hr.tvz.trackerplatform.wellbeingTips.model;
+package hr.tvz.trackerplatform.wellbeing_tip.model;
 
 import hr.tvz.trackerplatform.question.enums.QuestionCategory;
 import jakarta.persistence.*;

@@ -58,4 +58,8 @@ public class User {
     public int hashCode() {
         return Objects.hash(firstName, lastName, email, role);
     }
+
+    public void updatePassword(String password) {
+        this.password = password;
+    }
 }

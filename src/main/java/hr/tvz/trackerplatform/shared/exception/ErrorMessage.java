@@ -13,6 +13,7 @@ public enum ErrorMessage {
     USER_NOT_FOUND("User not found", HttpStatus.NOT_FOUND),
     EMAIL_ALREADY_EXISTS("Email already exists", HttpStatus.BAD_REQUEST),
     INVALID_CREDENTIALS("Invalid credentials", HttpStatus.UNAUTHORIZED),
+    REQUIRE_AUTHENTICATION("Require authentication", HttpStatus.UNAUTHORIZED),
     PASSWORDS_DO_NOT_MATCH("Passwords do not match", HttpStatus.BAD_REQUEST),
     PASSWORD_TOO_SHORT("Password must be at least 8 characters long", HttpStatus.BAD_REQUEST),
     PASSWORD_TOO_WEAK("Password must contain at least one number and one special character", HttpStatus.BAD_REQUEST),
