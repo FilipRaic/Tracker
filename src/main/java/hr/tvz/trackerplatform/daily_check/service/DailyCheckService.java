@@ -8,6 +8,8 @@ import hr.tvz.trackerplatform.daily_check.repository.DailyCheckRepository;
 import hr.tvz.trackerplatform.shared.exception.ErrorMessage;
 import hr.tvz.trackerplatform.shared.exception.TrackerException;
 import hr.tvz.trackerplatform.shared.mapper.Mapper;
+import hr.tvz.trackerplatform.user.model.User;
+import hr.tvz.trackerplatform.user.security.UserSecurity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,14 @@ public class DailyCheckService {
 
     private final Mapper mapper;
     private final DailyCheckRepository dailyCheckRepository;
+    private final UserSecurity userSecurity;
+
+    public List<DailyCheckDTO> findAllCompletedCheckIns() {
+        User currentUser = userSecurity.getCurrentUser();
+        return mapper.mapList(dailyCheckRepository.findAllByUser(currentUser).stream()
+                .filter(DailyCheck::isCompleted)
+                .toList(), DailyCheckDTO.class);
+    }
 
     @Transactional(readOnly = true)
     public DailyCheckDTO getDailyCheckByUuid(UUID uuid) {

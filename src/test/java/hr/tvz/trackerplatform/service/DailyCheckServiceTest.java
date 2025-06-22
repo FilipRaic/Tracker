@@ -11,6 +11,9 @@ import hr.tvz.trackerplatform.question.enums.QuestionCategory;
 import hr.tvz.trackerplatform.shared.exception.ErrorMessage;
 import hr.tvz.trackerplatform.shared.exception.TrackerException;
 import hr.tvz.trackerplatform.shared.mapper.Mapper;
+import hr.tvz.trackerplatform.user.model.User;
+import hr.tvz.trackerplatform.user.security.UserSecurity;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -37,6 +41,8 @@ class DailyCheckServiceTest {
     private Mapper mapper;
     @Mock
     private DailyCheckRepository dailyCheckRepository;
+    @Mock
+    private UserSecurity userSecurity;
 
     @InjectMocks
     private DailyCheckService dailyCheckService;
@@ -72,6 +78,49 @@ class DailyCheckServiceTest {
                 .id(1L)
                 .questions(dailyQuestionDtos)
                 .build();
+    }
+
+    @AfterEach
+    void tearDown() {
+        dailyCheck.setCompleted(false);
+    }
+
+    @Test
+    void findAllCompletedCheckIns_shouldReturnEmptyList_whenNoneAreCompleted(){
+        // Given
+        User user = new User();
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(dailyCheckRepository.findAllByUser(user)).thenReturn(List.of(dailyCheck));
+        when(mapper.mapList(Collections.emptyList(), DailyCheckDTO.class)).thenReturn(Collections.emptyList());
+
+        // When
+        List<DailyCheckDTO> allCompletedCheckIns = dailyCheckService.findAllCompletedCheckIns();
+
+        // Then
+        assertThat(allCompletedCheckIns)
+                .isNotNull()
+                .isEmpty();
+    }
+
+    @Test
+    void findAllCompletedCheckIns_shouldReturnACheckIn_whenItIsCompleted(){
+        // Given
+        User user = new User();
+        dailyCheck.setCompleted(true);
+        List<DailyCheck> dailyChecks = List.of(dailyCheck);
+        List<DailyCheckDTO> dailyCheckDTOS = List.of(dailyCheckDTO);
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(dailyCheckRepository.findAllByUser(user)).thenReturn(dailyChecks);
+        when(mapper.mapList(dailyChecks, DailyCheckDTO.class)).thenReturn(dailyCheckDTOS);
+
+        // When
+        List<DailyCheckDTO> allCompletedCheckIns = dailyCheckService.findAllCompletedCheckIns();
+
+        // Then
+        assertThat(allCompletedCheckIns)
+                .isNotNull()
+                .isNotEmpty()
+                .isEqualTo(dailyCheckDTOS);;
     }
 
     @Test

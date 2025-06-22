@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,6 +45,39 @@ class DailyCheckControllerTest {
     }
 
     @Test
+    void findAllCompletedCheckIns_shouldReturnCompletedCheckIns() throws Exception {
+        DailyCheckDTO dailyCheckDTO = DailyCheckDTO.builder()
+                .id(1L)
+                .questions(List.of(
+                        DailyQuestionDTO.builder().id(1L).content("Question 1").category(QuestionCategory.MENTAL).build(),
+                        DailyQuestionDTO.builder().id(2L).content("Question 2").category(QuestionCategory.EMOTIONAL).build()
+                ))
+                .completed(true)
+                .build();
+        when(dailyCheckService.findAllCompletedCheckIns()).thenReturn(List.of(dailyCheckDTO));
+
+        mockMvc.perform(get("/api/daily-check/completed"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].questions").isArray())
+                .andExpect(jsonPath("$[0].questions.length()").value(2))
+                .andExpect(jsonPath("$[0].questions[0].content").value("Question 1"))
+                .andExpect(jsonPath("$[0].questions[1].content").value("Question 2"));
+    }
+
+    @Test
+    void findAllCompletedCheckIns_shouldReturnNoCheckIns() throws Exception {
+        when(dailyCheckService.findAllCompletedCheckIns()).thenReturn(Collections.emptyList());
+        mockMvc.perform(get("/api/daily-check/completed"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
     void getCheckInByUuid_shouldReturnDailyCheck() throws Exception {
         UUID uuid = UUID.randomUUID();
         DailyCheckDTO dailyCheckDTO = DailyCheckDTO.builder()
@@ -56,7 +90,7 @@ class DailyCheckControllerTest {
 
         when(dailyCheckService.getDailyCheckByUuid(uuid)).thenReturn(dailyCheckDTO);
 
-        mockMvc.perform(get("/api/daily-check/{uuid}", uuid))
+        mockMvc.perform(get("/api/daily-check/public/{uuid}", uuid))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(1))
@@ -78,7 +112,7 @@ class DailyCheckControllerTest {
 
         doNothing().when(dailyCheckService).submitDailyCheck(any(DailyCheckSubmitDTO.class));
 
-        mockMvc.perform(post("/api/daily-check/submit")
+        mockMvc.perform(post("/api/daily-check/public/submit")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(submitDTO)))
                 .andExpect(status().isOk());
@@ -93,7 +127,7 @@ class DailyCheckControllerTest {
                 .questions(List.of())
                 .build();
 
-        mockMvc.perform(post("/api/daily-check/submit")
+        mockMvc.perform(post("/api/daily-check/public/submit")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidSubmitDTO)))
                 .andExpect(status().isBadRequest());

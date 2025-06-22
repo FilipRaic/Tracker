@@ -2,6 +2,7 @@ package hr.tvz.trackerplatform.daily_check.dto;
 
 import lombok.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +20,8 @@ public class DailyCheckDTO {
     private List<DailyQuestionDTO> questions = new ArrayList<>();
 
     private boolean completed;
+
+    private LocalDate checkInDate;
 
     private String userFirstName;
 }
