@@ -58,6 +58,12 @@ public class UserSecurity {
         throw new TrackerException(USER_NOT_FOUND);
     }
 
+    public User getCurrentUser() {
+        Long currentUserId = getCurrentUserId();
+        return userRepository.findById(currentUserId)
+                .orElseThrow(() -> new TrackerException(USER_NOT_FOUND));
+    }
+
     public String getCurrentUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {

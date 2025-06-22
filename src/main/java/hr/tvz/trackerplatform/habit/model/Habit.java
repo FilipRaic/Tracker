@@ -1,5 +1,6 @@
 package hr.tvz.trackerplatform.habit.model;
 
+import hr.tvz.trackerplatform.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,6 +34,10 @@ public class Habit {
     @JoinColumn(name = "frequency_id", nullable = false)
     private HabitFrequency habitFrequency;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Habit that))
@@ -42,11 +47,12 @@ public class Habit {
             return id.equals(that.getId());
 
         return Objects.equals(name, that.name) && Objects.equals(begin, that.begin) &&
-                Objects.equals(description, that.description) && Objects.equals(habitFrequency, that.habitFrequency);
+                Objects.equals(description, that.description) && Objects.equals(habitFrequency, that.habitFrequency) &&
+                Objects.equals(user, that.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, begin, description, habitFrequency);
+        return Objects.hash(name, begin, description, habitFrequency, user);
     }
 }

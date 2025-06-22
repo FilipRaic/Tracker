@@ -1,6 +1,5 @@
 package hr.tvz.trackerplatform.shared.mapper;
 
-import hr.tvz.trackerplatform.daily_check.dto.DailyQuestionDTO;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
