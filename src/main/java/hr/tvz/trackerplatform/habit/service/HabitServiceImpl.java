@@ -8,6 +8,9 @@ import hr.tvz.trackerplatform.habit.model.HabitFrequency;
 import hr.tvz.trackerplatform.habit.repository.HabitCompletionRepository;
 import hr.tvz.trackerplatform.habit.repository.HabitFrequencyRepository;
 import hr.tvz.trackerplatform.habit.repository.HabitRepository;
+import hr.tvz.trackerplatform.user.model.User;
+import hr.tvz.trackerplatform.user.repository.UserRepository;
+import hr.tvz.trackerplatform.user.security.UserSecurity;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,10 +27,12 @@ public class HabitServiceImpl implements HabitService {
     private final HabitRepository habitRepository;
     private final HabitFrequencyRepository habitFrequencyRepository;
     private final HabitCompletionRepository habitCompletionRepository;
+    private final UserSecurity userSecurity;
 
     @Override
     public List<HabitDTO> findAll() {
-        return habitRepository.findAll().stream()
+        User currentUser = userSecurity.getCurrentUser();
+        return habitRepository.findAllByUser(currentUser).stream()
                 .map(this::mapToHabitDTO)
                 .toList();
     }
@@ -35,7 +40,8 @@ public class HabitServiceImpl implements HabitService {
     @Override
     public List<HabitStatusDTO> findCurrentHabitsWithStatus() {
         List<HabitStatusDTO> habitStatusDTOS = new ArrayList<>();
-        List<Habit> habits = habitRepository.findAll();
+        User currentUser = userSecurity.getCurrentUser();
+        List<Habit> habits = habitRepository.findAllByUser(currentUser);
 
         for (Habit habit : habits) {
             fillMissingHabitCompletions(habit);
@@ -134,11 +140,13 @@ public class HabitServiceImpl implements HabitService {
     private Habit mapToHabit(HabitDTO habitDTO) {
         HabitFrequency habitFrequency = habitFrequencyRepository.findByName(habitDTO.getFrequency())
                 .orElseThrow(() -> new EntityNotFoundException("Habit frequency not found!"));
+        User currentUser = userSecurity.getCurrentUser();
         return Habit.builder()
                 .name(habitDTO.getName())
                 .habitFrequency(habitFrequency)
                 .begin(habitDTO.getStartDate())
                 .description(habitDTO.getNotes())
+                .user(currentUser)
                 .build();
     }
 

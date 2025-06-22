@@ -3,6 +3,8 @@ package hr.tvz.trackerplatform.journal_entry.service;
 import hr.tvz.trackerplatform.journal_entry.dto.JournalEntryDTO;
 import hr.tvz.trackerplatform.journal_entry.model.JournalEntry;
 import hr.tvz.trackerplatform.journal_entry.repository.JournalEntryRepository;
+import hr.tvz.trackerplatform.user.model.User;
+import hr.tvz.trackerplatform.user.security.UserSecurity;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,11 +28,15 @@ class JournalEntryServiceTest {
     @Mock
     private JournalEntryRepository journalEntryRepository;
 
+    @Mock
+    private UserSecurity userSecurity;
+
     @InjectMocks
     private JournalEntryServiceImpl journalEntryService;
 
     @Test
     void findAll_shouldReturnAllJournalEntries() {
+        User user = new User();
         LocalDate today = LocalDate.now();
         LocalDate yesterday = today.minusDays(1);
 
@@ -46,7 +52,8 @@ class JournalEntryServiceTest {
                 .description("Yesterday's entry")
                 .build();
 
-        when(journalEntryRepository.findAll()).thenReturn(List.of(entry1, entry2));
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(journalEntryRepository.findAllByUser(user)).thenReturn(List.of(entry1, entry2));
 
         List<JournalEntryDTO> result = journalEntryService.findAll();
 
@@ -59,6 +66,7 @@ class JournalEntryServiceTest {
 
     @Test
     void create_shouldCreateJournalEntry() {
+        User user = new User();
         LocalDate today = LocalDate.now();
         JournalEntryDTO dto = JournalEntryDTO.builder()
                 .date(today)
@@ -71,6 +79,7 @@ class JournalEntryServiceTest {
                 .description("New entry")
                 .build();
 
+        when(userSecurity.getCurrentUser()).thenReturn(user);
         when(journalEntryRepository.save(any(JournalEntry.class))).thenReturn(savedEntry);
 
         JournalEntryDTO result = journalEntryService.create(dto);
@@ -88,6 +97,7 @@ class JournalEntryServiceTest {
 
     @Test
     void findByDate_shouldReturnJournalEntry() {
+        User user = new User();
         LocalDate today = LocalDate.now();
         JournalEntry entry = JournalEntry.builder()
                 .id(1L)
@@ -95,7 +105,8 @@ class JournalEntryServiceTest {
                 .description("Today's entry")
                 .build();
 
-        when(journalEntryRepository.findByDate(today)).thenReturn(entry);
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(journalEntryRepository.findByUserAndDate(user, today)).thenReturn(entry);
 
         JournalEntryDTO result = journalEntryService.findByDate(today);
 
@@ -105,6 +116,7 @@ class JournalEntryServiceTest {
 
     @Test
     void delete_shouldDeleteJournalEntry() {
+        User user = new User();
         LocalDate today = LocalDate.now();
         JournalEntry entry = JournalEntry.builder()
                 .id(1L)
@@ -112,7 +124,8 @@ class JournalEntryServiceTest {
                 .description("Today's entry")
                 .build();
 
-        when(journalEntryRepository.findByDate(today)).thenReturn(entry);
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(journalEntryRepository.findByUserAndDate(user, today)).thenReturn(entry);
 
         journalEntryService.delete(today);
 
@@ -121,6 +134,7 @@ class JournalEntryServiceTest {
 
     @Test
     void update_shouldUpdateJournalEntry() {
+        User user = new User();
         LocalDate today = LocalDate.now();
         JournalEntryDTO dto = JournalEntryDTO.builder()
                 .date(today)
@@ -133,7 +147,8 @@ class JournalEntryServiceTest {
                 .description("Original entry")
                 .build();
 
-        when(journalEntryRepository.findByDate(today)).thenReturn(existingEntry);
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(journalEntryRepository.findByUserAndDate(user, today)).thenReturn(existingEntry);
         when(journalEntryRepository.save(any(JournalEntry.class))).thenReturn(existingEntry);
 
         JournalEntryDTO result = journalEntryService.update(dto, today);
@@ -152,13 +167,15 @@ class JournalEntryServiceTest {
 
     @Test
     void update_shouldThrowException_whenJournalEntryNotFound() {
+        User user = new User();
         LocalDate today = LocalDate.now();
         JournalEntryDTO dto = JournalEntryDTO.builder()
                 .date(today)
                 .description("Updated entry")
                 .build();
 
-        when(journalEntryRepository.findByDate(today)).thenReturn(null);
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(journalEntryRepository.findByUserAndDate(user, today)).thenReturn(null);
 
         assertThatThrownBy(() -> journalEntryService.update(dto, today))
                 .isInstanceOf(EntityNotFoundException.class)

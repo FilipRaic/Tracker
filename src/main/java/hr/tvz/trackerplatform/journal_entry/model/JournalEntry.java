@@ -1,12 +1,13 @@
 package hr.tvz.trackerplatform.journal_entry.model;
 
+import hr.tvz.trackerplatform.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
-@Entity
+@Entity(name = "journal_entry")
 @Getter
 @Setter
 @Builder
@@ -27,6 +28,10 @@ public class JournalEntry {
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof JournalEntry that))
@@ -35,11 +40,12 @@ public class JournalEntry {
         if (Objects.nonNull(id) && Objects.nonNull(that.getId()))
             return id.equals(that.getId());
 
-        return Objects.equals(description, that.description) && Objects.equals(date, that.date);
+        return Objects.equals(description, that.description) && Objects.equals(date, that.date)
+                && Objects.equals(user, that.user);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(description, date);
+        return Objects.hash(description, date, user);
     }
 }

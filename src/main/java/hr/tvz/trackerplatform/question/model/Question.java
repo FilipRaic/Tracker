@@ -29,6 +29,12 @@ public class Question {
     @Column(name = "content", nullable = false)
     private String content;
 
+    @Column(name = "content_de", nullable = false)
+    private String contentDe;
+
+    @Column(name = "content_hr", nullable = false)
+    private String contentHr;
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Question that))
@@ -37,11 +43,12 @@ public class Question {
         if (Objects.nonNull(id) && Objects.nonNull(that.getId()))
             return id.equals(that.getId());
 
-        return category == that.category && Objects.equals(content, that.content);
+        return category == that.category && Objects.equals(content, that.content) &&
+                Objects.equals(contentDe, that.contentDe) && Objects.equals(contentHr, that.contentHr);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(category, content);
+        return Objects.hash(category, content, contentDe, contentHr);
     }
 }

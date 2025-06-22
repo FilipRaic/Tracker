@@ -9,6 +9,8 @@ import hr.tvz.trackerplatform.habit.repository.HabitCompletionRepository;
 import hr.tvz.trackerplatform.habit.repository.HabitFrequencyRepository;
 import hr.tvz.trackerplatform.habit.repository.HabitRepository;
 import hr.tvz.trackerplatform.habit.service.HabitServiceImpl;
+import hr.tvz.trackerplatform.user.model.User;
+import hr.tvz.trackerplatform.user.security.UserSecurity;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,15 +35,19 @@ class HabitServiceTest {
     private HabitFrequencyRepository habitFrequencyRepository;
     @Mock
     private HabitCompletionRepository habitCompletionRepository;
+    @Mock
+    private UserSecurity userSecurity;
 
     @InjectMocks
     private HabitServiceImpl habitService;
 
     @Test
     void testFindAllReturnsDTOs() {
+        User user = new User();
         HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
-        Habit habit = new Habit(1L, "Run", LocalDate.now(), "Daily jogging", dailyFrequency);
-        when(habitRepository.findAll()).thenReturn(List.of(habit));
+        Habit habit = new Habit(1L, "Run", LocalDate.now(), "Daily jogging", dailyFrequency, user);
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(habitRepository.findAllByUser(user)).thenReturn(List.of(habit));
 
         List<HabitDTO> result = habitService.findAll();
 
@@ -52,10 +58,12 @@ class HabitServiceTest {
 
     @Test
     void testCreateHabit() {
+        User user = new User();
         LocalDate startDate = LocalDate.now();
         HabitFrequency weeklyFrequency = new HabitFrequency(1, "week");
         HabitDTO dto = new HabitDTO(1L, "Read", startDate, weeklyFrequency.getName(), "Book");
-        Habit habit = new Habit(1L, "Read", startDate, "Book", weeklyFrequency);
+        Habit habit = new Habit(1L, "Read", startDate, "Book", weeklyFrequency, user);
+        when(userSecurity.getCurrentUser()).thenReturn(user);
         when(habitFrequencyRepository.findByName(weeklyFrequency.getName())).thenReturn(Optional.of(weeklyFrequency));
         when(habitRepository.save(any())).thenReturn(habit);
 
@@ -66,19 +74,21 @@ class HabitServiceTest {
 
     @Test
     void findCurrentHabitsWithStatus() {
+        User user = new User();
         LocalDate startDate = LocalDate.now();
         LocalDate completionDate = startDate.plusDays(1);
         HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
-        Habit firstHabit = new Habit(1L, "Workout", startDate, null, dailyFrequency);
-        Habit secondHabit = new Habit(2L, "Lunch", startDate, null, dailyFrequency);
-        Habit thirdHabit = new Habit(3L, "Dinner", startDate, null, dailyFrequency);
+        Habit firstHabit = new Habit(1L, "Workout", startDate, null, dailyFrequency, user);
+        Habit secondHabit = new Habit(2L, "Lunch", startDate, null, dailyFrequency, user);
+        Habit thirdHabit = new Habit(3L, "Dinner", startDate, null, dailyFrequency, user);
         HabitCompletion firstHabitCompletion = new HabitCompletion(1L, completionDate, false, firstHabit);
         HabitCompletion secondHabitCompletion = new HabitCompletion(1L, completionDate, true, secondHabit);
         HabitCompletion thirdHabitCompletion = new HabitCompletion(1L, completionDate, false, thirdHabit);
         HabitStatusDTO firstHabitStatusDTO = buildHabitStatusDTO(firstHabit, completionDate, false);
         HabitStatusDTO secondHabitStatusDTO = buildHabitStatusDTO(secondHabit, completionDate, true);
         HabitStatusDTO thirdHabitStatusDTO = buildHabitStatusDTO(thirdHabit, completionDate, false);
-        when(habitRepository.findAll()).thenReturn(List.of(firstHabit, secondHabit, thirdHabit));
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(habitRepository.findAllByUser(user)).thenReturn(List.of(firstHabit, secondHabit, thirdHabit));
         when(habitCompletionRepository.existsByHabitAndCompletionDate(any(), any())).thenReturn(true);
         when(habitCompletionRepository.findFirstByHabitAndCompletionDateGreaterThanEqualOrderByCompletionDateAsc(
                 eq(firstHabit), any())).thenReturn(Optional.of(firstHabitCompletion));
@@ -97,11 +107,12 @@ class HabitServiceTest {
 
     @Test
     void changeHabitStatus() {
+        User user = new User();
         Long habitId = 1L;
         LocalDate today = LocalDate.now();
         LocalDate completionDate = today.plusDays(1);
         HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
-        Habit habit = new Habit(habitId, "Workout", today, null, dailyFrequency);
+        Habit habit = new Habit(habitId, "Workout", today, null, dailyFrequency, user);
         HabitCompletion habitCompletion = new HabitCompletion(1L, completionDate, false, habit);
         HabitCompletion changedHabitCompletion = new HabitCompletion(1L, completionDate, true, habit);
         when(habitRepository.findById(habitId)).thenReturn(Optional.of(habit));
@@ -117,9 +128,10 @@ class HabitServiceTest {
 
     @Test
     void deleteHabit() {
+        User user = new User();
         Long habitId = 1L;
         HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
-        Habit habit = new Habit(habitId, "Workout", LocalDate.now(), null, dailyFrequency);
+        Habit habit = new Habit(habitId, "Workout", LocalDate.now(), null, dailyFrequency, user);
         when(habitRepository.findById(habitId)).thenReturn(Optional.of(habit));
 
         habitService.deleteHabit(habitId);

@@ -29,6 +29,11 @@ public class DailyQuestion implements Serializable {
     @Column(name = "content", nullable = false)
     private String content;
 
+    @Column(name = "content_de", nullable = false)
+    private String contentDe;
+
+    @Column(name = "content_hr", nullable = false)
+    private String contentHr;
     @Column(name = "score")
     private Integer score;
 
@@ -41,11 +46,12 @@ public class DailyQuestion implements Serializable {
             return id.equals(that.getId());
 
         return Objects.equals(category, that.category) && Objects.equals(content, that.content) &&
+                Objects.equals(contentDe, that.contentDe) && Objects.equals(contentHr, that.contentHr) &&
                 Objects.equals(score, that.score);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(category, content, score);
+        return Objects.hash(category, content, contentDe, contentHr, score);
     }
 }

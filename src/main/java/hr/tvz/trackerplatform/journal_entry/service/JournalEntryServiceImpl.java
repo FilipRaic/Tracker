@@ -3,6 +3,8 @@ package hr.tvz.trackerplatform.journal_entry.service;
 import hr.tvz.trackerplatform.journal_entry.dto.JournalEntryDTO;
 import hr.tvz.trackerplatform.journal_entry.model.JournalEntry;
 import hr.tvz.trackerplatform.journal_entry.repository.JournalEntryRepository;
+import hr.tvz.trackerplatform.user.model.User;
+import hr.tvz.trackerplatform.user.security.UserSecurity;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,10 +18,12 @@ import java.util.Optional;
 public class JournalEntryServiceImpl implements JournalEntryService {
 
     private final JournalEntryRepository journalEntryRepository;
+    private final UserSecurity userSecurity;
 
     @Override
     public List<JournalEntryDTO> findAll() {
-        return journalEntryRepository.findAll().stream()
+        User currentUser = userSecurity.getCurrentUser();
+        return journalEntryRepository.findAllByUser(currentUser).stream()
                 .map(this::mapToJournalEntryDTO)
                 .toList();
     }
@@ -32,18 +36,22 @@ public class JournalEntryServiceImpl implements JournalEntryService {
 
     @Override
     public JournalEntryDTO findByDate(LocalDate date) {
-        return mapToJournalEntryDTO(journalEntryRepository.findByDate(date));
+        User currentUser = userSecurity.getCurrentUser();
+        return mapToJournalEntryDTO(journalEntryRepository.findByUserAndDate(currentUser, date));
     }
 
     @Override
     public void delete(LocalDate date) {
-        Long id = journalEntryRepository.findByDate(date).getId();
+        User currentUser = userSecurity.getCurrentUser();
+        Long id = journalEntryRepository.findByUserAndDate(currentUser, date).getId();
         journalEntryRepository.deleteById(id);
     }
 
     @Override
     public JournalEntryDTO update(JournalEntryDTO journalEntryDTO, LocalDate date) {
-        Optional<JournalEntry> journalEntryOptional = Optional.ofNullable(journalEntryRepository.findByDate(date));
+        User currentUser = userSecurity.getCurrentUser();
+        Optional<JournalEntry> journalEntryOptional = Optional.ofNullable(
+                journalEntryRepository.findByUserAndDate(currentUser, date));
 
         if (journalEntryOptional.isPresent()) {
             JournalEntry journalEntryToUpdate = journalEntryOptional.get();
@@ -67,9 +75,11 @@ public class JournalEntryServiceImpl implements JournalEntryService {
     }
 
     private JournalEntry mapToJournalEntry(JournalEntryDTO journalEntryDTO) {
+        User currentUser = userSecurity.getCurrentUser();
         return JournalEntry.builder()
                 .date(journalEntryDTO.getDate())
                 .description(journalEntryDTO.getDescription())
+                .user(currentUser)
                 .build();
     }
 }
