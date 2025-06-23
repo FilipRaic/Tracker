@@ -86,4 +86,8 @@ public class DailyCheck {
         this.completedAt = Instant.now();
         this.completed = true;
     }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
 }

@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -19,12 +20,17 @@ public class DailyCheckController {
 
     private final DailyCheckService dailyCheckService;
 
-    @GetMapping("/{uuid}")
+    @GetMapping("/completed")
+    public ResponseEntity<List<DailyCheckDTO>> findAllCompletedCheckIns() {
+        return ResponseEntity.ok(dailyCheckService.findAllCompletedCheckIns());
+    }
+
+    @GetMapping("/public/{uuid}")
     public ResponseEntity<DailyCheckDTO> getCheckInByUuid(@PathVariable UUID uuid) {
         return ResponseEntity.ok(dailyCheckService.getDailyCheckByUuid(uuid));
     }
 
-    @PostMapping("/submit")
+    @PostMapping("/public/submit")
     public ResponseEntity<Void> submitDailyCheck(@Valid @RequestBody DailyCheckSubmitDTO dailyCheckSubmitDTO) {
         log.info("Submitting responses for daily check {}", dailyCheckSubmitDTO.getId());
 

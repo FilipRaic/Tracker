@@ -27,7 +27,7 @@ public class SecurityConfig {
 
     public static final String[] PUBLIC_ENDPOINTS = {
             "/api/auth/**",
-            "/api/daily-check/**"
+            "/api/daily-check/public/**"
     };
 
     private final JwtAuthenticationFilter jwtAuthFilter;
