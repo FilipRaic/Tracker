@@ -391,7 +391,6 @@ class DailyCheckTest {
     }
 
     @Test
-    @Disabled("This test is not working properly")
     void testEqualsWithNullIdsSomeNullFields() {
         DailyCheck check1 = DailyCheck.builder()
                 .uuid(dailyCheck.getUuid())
