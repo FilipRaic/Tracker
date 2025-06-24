@@ -55,6 +55,7 @@ public class DailyCheck {
     @JoinColumn(name = "daily_check_id", foreignKey = @ForeignKey(name = "fk_question_daily_check"))
     private List<DailyQuestion> questions = new ArrayList<>();
 
+    @Setter
     @Builder.Default
     @Column(name = "completed", nullable = false)
     private boolean completed = false;
@@ -85,9 +86,5 @@ public class DailyCheck {
         this.questions = new ArrayList<>(dailyQuestions);
         this.completedAt = Instant.now();
         this.completed = true;
-    }
-
-    public void setCompleted(boolean completed) {
-        this.completed = completed;
     }
 }

@@ -1,4 +1,4 @@
-package hr.tvz.trackerplatform.service;
+package hr.tvz.trackerplatform.habit.service;
 
 import hr.tvz.trackerplatform.habit.dto.HabitDTO;
 import hr.tvz.trackerplatform.habit.dto.HabitStatusDTO;
@@ -8,9 +8,9 @@ import hr.tvz.trackerplatform.habit.model.HabitFrequency;
 import hr.tvz.trackerplatform.habit.repository.HabitCompletionRepository;
 import hr.tvz.trackerplatform.habit.repository.HabitFrequencyRepository;
 import hr.tvz.trackerplatform.habit.repository.HabitRepository;
-import hr.tvz.trackerplatform.habit.service.HabitServiceImpl;
 import hr.tvz.trackerplatform.user.model.User;
 import hr.tvz.trackerplatform.user.security.UserSecurity;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,22 +21,23 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class HabitServiceTest {
+
+    @Mock
+    private UserSecurity userSecurity;
     @Mock
     private HabitRepository habitRepository;
     @Mock
     private HabitFrequencyRepository habitFrequencyRepository;
     @Mock
     private HabitCompletionRepository habitCompletionRepository;
-    @Mock
-    private UserSecurity userSecurity;
 
     @InjectMocks
     private HabitServiceImpl habitService;
@@ -139,6 +140,69 @@ class HabitServiceTest {
         verify(habitRepository).findById(habitId);
         verify(habitCompletionRepository).deleteByHabit(habit);
         verify(habitRepository).delete(habit);
+    }
+
+    @Test
+    void create_shouldThrowException_whenHabitFrequencyNotFound() {
+        HabitDTO dto = new HabitDTO(null, "Meditate", LocalDate.now(), "non-existent-frequency", "Calm mind");
+        when(habitFrequencyRepository.findByName("non-existent-frequency")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> habitService.create(dto))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Habit frequency not found!");
+    }
+
+    @Test
+    void findCurrentHabitsWithStatus_shouldThrow_whenHabitCompletionMissing() {
+        User user = new User();
+        HabitFrequency frequency = new HabitFrequency(1, "day");
+        Habit habit = new Habit(1L, "Read", LocalDate.now(), "Books", frequency, user);
+
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(habitRepository.findAllByUser(user)).thenReturn(List.of(habit));
+        when(habitCompletionRepository.existsByHabitAndCompletionDate(any(), any())).thenReturn(true);
+        when(habitCompletionRepository.findFirstByHabitAndCompletionDateGreaterThanEqualOrderByCompletionDateAsc(eq(habit), any()))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> habitService.findCurrentHabitsWithStatus())
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Habit completion should exist");
+    }
+
+    @Test
+    void changeHabitStatus_shouldThrow_whenHabitNotFound() {
+        when(habitRepository.findById(42L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> habitService.changeHabitStatus(42L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Habit should exist");
+    }
+
+    @Test
+    void deleteHabit_shouldThrow_whenHabitNotFound() {
+        when(habitRepository.findById(100L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> habitService.deleteHabit(100L))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Habit should exist");
+    }
+
+    @Test
+    void create_shouldHandleMonthlyFrequency() {
+        User user = new User();
+        LocalDate startDate = LocalDate.now().minusMonths(2);
+        HabitFrequency monthly = new HabitFrequency(1, "month");
+        HabitDTO dto = new HabitDTO(null, "Budget", startDate, monthly.getName(), "Finance");
+        Habit savedHabit = new Habit(1L, "Budget", startDate, "Finance", monthly, user);
+
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(habitFrequencyRepository.findByName(monthly.getName())).thenReturn(Optional.of(monthly));
+        when(habitRepository.save(any())).thenReturn(savedHabit);
+
+        HabitDTO result = habitService.create(dto);
+
+        assertEquals("Budget", result.getName());
+        verify(habitCompletionRepository, times(2)).save(any());
     }
 
     private HabitStatusDTO buildHabitStatusDTO(Habit habit, LocalDate completionDate, boolean done) {

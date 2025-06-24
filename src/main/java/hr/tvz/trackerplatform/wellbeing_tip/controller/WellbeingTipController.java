@@ -23,7 +23,7 @@ public class WellbeingTipController {
     @GetMapping
     public ResponseEntity<List<WellbeingTipDTO>> findWellbeingTips() {
         List<DailyQuestion> dailyQuestions = dailyQuestionService.findTop4ByOrderByIdDesc();
-        List<WellbeingTipDTO> wellbeingTipDTOS = wellbeingTipService.findByCategoryAndAndScore(dailyQuestions);
+        List<WellbeingTipDTO> wellbeingTipDTOS = wellbeingTipService.findByCategoryAndScore(dailyQuestions);
 
         return ResponseEntity.ok(wellbeingTipDTOS);
     }

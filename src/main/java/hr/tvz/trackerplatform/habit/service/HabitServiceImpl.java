@@ -9,7 +9,6 @@ import hr.tvz.trackerplatform.habit.repository.HabitCompletionRepository;
 import hr.tvz.trackerplatform.habit.repository.HabitFrequencyRepository;
 import hr.tvz.trackerplatform.habit.repository.HabitRepository;
 import hr.tvz.trackerplatform.user.model.User;
-import hr.tvz.trackerplatform.user.repository.UserRepository;
 import hr.tvz.trackerplatform.user.security.UserSecurity;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;

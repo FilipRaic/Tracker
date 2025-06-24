@@ -38,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password/send")
-    public ResponseEntity<AuthResponse> sendResetPasswordEmail(@Valid @RequestBody ResetPasswordEmailRequest request) {
+    public ResponseEntity<Void> sendResetPasswordEmail(@Valid @RequestBody ResetPasswordEmailRequest request) {
         userService.sendResetPasswordEmail(request);
 
         return ResponseEntity.ok().build();
@@ -46,7 +46,7 @@ public class AuthController {
 
     @PostMapping("/reset-password")
     @PreAuthorize("@userSecurity.isCurrentUser()")
-    public ResponseEntity<AuthResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         String email = userSecurity.getCurrentUserEmail();
         userService.resetPassword(request, email);
 

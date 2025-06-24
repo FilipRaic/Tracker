@@ -34,6 +34,7 @@ public class DailyQuestion implements Serializable {
 
     @Column(name = "content_hr", nullable = false)
     private String contentHr;
+
     @Column(name = "score")
     private Integer score;
 

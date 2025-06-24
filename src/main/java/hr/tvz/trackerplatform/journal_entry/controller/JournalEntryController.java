@@ -2,6 +2,7 @@ package hr.tvz.trackerplatform.journal_entry.controller;
 
 import hr.tvz.trackerplatform.journal_entry.dto.JournalEntryDTO;
 import hr.tvz.trackerplatform.journal_entry.service.JournalEntryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -31,7 +32,7 @@ public class JournalEntryController {
     }
 
     @PostMapping
-    public ResponseEntity<JournalEntryDTO> createJournalEntry(@RequestBody JournalEntryDTO journalEntryDTO) {
+    public ResponseEntity<JournalEntryDTO> createJournalEntry(@RequestBody @Valid JournalEntryDTO journalEntryDTO) {
         JournalEntryDTO createdJournalEntry = journalEntryService.create(journalEntryDTO);
         return ResponseEntity
                 .status(HttpStatus.CREATED)

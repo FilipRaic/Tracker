@@ -28,14 +28,18 @@ public class WellbeingTip {
     @Column(name = "score")
     private Integer score;
 
-    @Column(name="tip_text")
+    @Column(name = "tip_text")
     private String tipText;
 
     @Override
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (!(object instanceof WellbeingTip that)) return false;
-        return Objects.equals(id, that.id) && category == that.category && Objects.equals(score, that.score) && Objects.equals(tipText, that.tipText);
+    public boolean equals(Object o) {
+        if (!(o instanceof WellbeingTip that))
+            return false;
+
+        if (Objects.nonNull(id) && Objects.nonNull(that.getId()))
+            return id.equals(that.getId());
+
+        return category == that.category && Objects.equals(score, that.score) && Objects.equals(tipText, that.tipText);
     }
 
     @Override

@@ -6,5 +6,5 @@ import hr.tvz.trackerplatform.daily_check.model.DailyQuestion;
 import java.util.List;
 
 public interface WellbeingTipService {
-    List<WellbeingTipDTO> findByCategoryAndAndScore(List<DailyQuestion> listQuestions);
+    List<WellbeingTipDTO> findByCategoryAndScore(List<DailyQuestion> listQuestions);
 }

@@ -1,12 +1,10 @@
 package hr.tvz.trackerplatform.user.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.Instant;
+import java.util.Objects;
 
 @Entity
 @Table(
@@ -15,6 +13,7 @@ import java.time.Instant;
 )
 @Getter
 @Builder
+@ToString(exclude = {"user"})
 @NoArgsConstructor
 @AllArgsConstructor
 public class RefreshToken {
@@ -34,6 +33,22 @@ public class RefreshToken {
 
     @Column(name = "expiry_date", nullable = false)
     private Instant expiryDate;
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof RefreshToken that))
+            return false;
+
+        if (Objects.nonNull(id) && Objects.nonNull(that.getId()))
+            return id.equals(that.getId());
+
+        return Objects.equals(token, that.token) && Objects.equals(user, that.user) && Objects.equals(expiryDate, that.expiryDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, token, user, expiryDate);
+    }
 
     public boolean isExpired() {
         return expiryDate.isBefore(Instant.now());

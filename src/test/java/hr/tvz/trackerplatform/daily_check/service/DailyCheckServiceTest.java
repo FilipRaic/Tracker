@@ -1,4 +1,4 @@
-package hr.tvz.trackerplatform.service;
+package hr.tvz.trackerplatform.daily_check.service;
 
 import hr.tvz.trackerplatform.daily_check.dto.DailyCheckDTO;
 import hr.tvz.trackerplatform.daily_check.dto.DailyCheckSubmitDTO;
@@ -6,14 +6,12 @@ import hr.tvz.trackerplatform.daily_check.dto.DailyQuestionDTO;
 import hr.tvz.trackerplatform.daily_check.model.DailyCheck;
 import hr.tvz.trackerplatform.daily_check.model.DailyQuestion;
 import hr.tvz.trackerplatform.daily_check.repository.DailyCheckRepository;
-import hr.tvz.trackerplatform.daily_check.service.DailyCheckService;
 import hr.tvz.trackerplatform.question.enums.QuestionCategory;
 import hr.tvz.trackerplatform.shared.exception.ErrorMessage;
 import hr.tvz.trackerplatform.shared.exception.TrackerException;
 import hr.tvz.trackerplatform.shared.mapper.Mapper;
 import hr.tvz.trackerplatform.user.model.User;
 import hr.tvz.trackerplatform.user.security.UserSecurity;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +22,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -80,47 +77,37 @@ class DailyCheckServiceTest {
                 .build();
     }
 
-    @AfterEach
-    void tearDown() {
-        dailyCheck.setCompleted(false);
-    }
-
     @Test
-    void findAllCompletedCheckIns_shouldReturnEmptyList_whenNoneAreCompleted(){
-        // Given
+    void findAllCompletedCheckIns_shouldReturnEmptyList_whenNoneAreCompleted() {
         User user = new User();
         when(userSecurity.getCurrentUser()).thenReturn(user);
-        when(dailyCheckRepository.findAllByUser(user)).thenReturn(List.of(dailyCheck));
-        when(mapper.mapList(Collections.emptyList(), DailyCheckDTO.class)).thenReturn(Collections.emptyList());
+        when(dailyCheckRepository.findAllByUserAndCompletedTrue(user)).thenReturn(List.of());
+        when(mapper.mapList(List.of(), DailyCheckDTO.class)).thenReturn(List.of());
 
-        // When
         List<DailyCheckDTO> allCompletedCheckIns = dailyCheckService.findAllCompletedCheckIns();
 
-        // Then
         assertThat(allCompletedCheckIns)
                 .isNotNull()
                 .isEmpty();
     }
 
     @Test
-    void findAllCompletedCheckIns_shouldReturnACheckIn_whenItIsCompleted(){
-        // Given
+    void findAllCompletedCheckIns_shouldReturnACheckIn_whenItIsCompleted() {
         User user = new User();
         dailyCheck.setCompleted(true);
         List<DailyCheck> dailyChecks = List.of(dailyCheck);
         List<DailyCheckDTO> dailyCheckDTOS = List.of(dailyCheckDTO);
         when(userSecurity.getCurrentUser()).thenReturn(user);
-        when(dailyCheckRepository.findAllByUser(user)).thenReturn(dailyChecks);
+        when(dailyCheckRepository.findAllByUserAndCompletedTrue(user)).thenReturn(dailyChecks);
         when(mapper.mapList(dailyChecks, DailyCheckDTO.class)).thenReturn(dailyCheckDTOS);
 
-        // When
         List<DailyCheckDTO> allCompletedCheckIns = dailyCheckService.findAllCompletedCheckIns();
 
-        // Then
         assertThat(allCompletedCheckIns)
                 .isNotNull()
                 .isNotEmpty()
-                .isEqualTo(dailyCheckDTOS);;
+                .isEqualTo(dailyCheckDTOS);
+        ;
     }
 
     @Test

@@ -9,5 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface WellbeingTipRepository extends JpaRepository<WellbeingTip, Long> {
-    Optional<WellbeingTip> findByCategoryAndAndScore(QuestionCategory category, Integer score);
+
+    Optional<WellbeingTip> findByCategoryAndScore(QuestionCategory category, Integer score);
 }

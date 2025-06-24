@@ -13,8 +13,7 @@ public class DailyQuestionService {
 
     private final DailyQuestionRepository dailyQuestionRepository;
 
-    public List<DailyQuestion> findTop4ByOrderByIdDesc(){
-        List<DailyQuestion> dailyQuestions=dailyQuestionRepository.findTop4ByOrderByIdDesc();
-        return dailyQuestions;
+    public List<DailyQuestion> findTop4ByOrderByIdDesc() {
+        return dailyQuestionRepository.findTop4ByOrderByIdDesc();
     }
 }

@@ -2,16 +2,14 @@ package hr.tvz.trackerplatform.question.model;
 
 import hr.tvz.trackerplatform.question.enums.QuestionCategory;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Objects;
 
 @Entity
 @Getter
 @Builder
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class Question {

@@ -7,6 +7,7 @@ import hr.tvz.trackerplatform.wellbeing_tip.repository.WellbeingTipRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,9 +19,13 @@ public class WellbeingTipServiceImpl implements WellbeingTipService {
     private final WellbeingTipRepository wellbeingTipRepository;
 
     @Override
-    public List<WellbeingTipDTO> findByCategoryAndAndScore(List<DailyQuestion> listQuestions) {
+    public List<WellbeingTipDTO> findByCategoryAndScore(List<DailyQuestion> listQuestions) {
+        if (listQuestions == null || listQuestions.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         return listQuestions.stream()
-                .map(dailyQuestion -> wellbeingTipRepository.findByCategoryAndAndScore(dailyQuestion.getCategory(), dailyQuestion.getScore()))
+                .map(dailyQuestion -> wellbeingTipRepository.findByCategoryAndScore(dailyQuestion.getCategory(), dailyQuestion.getScore()))
                 .filter(Optional::isPresent)
                 .map(tipOptional -> mapper.map(tipOptional.get(), WellbeingTipDTO.class))
                 .toList();
