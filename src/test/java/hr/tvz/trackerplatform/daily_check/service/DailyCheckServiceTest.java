@@ -107,7 +107,6 @@ class DailyCheckServiceTest {
                 .isNotNull()
                 .isNotEmpty()
                 .isEqualTo(dailyCheckDTOS);
-        ;
     }
 
     @Test

@@ -122,7 +122,7 @@ public class UserServiceImpl implements UserService {
             throw new TrackerException(ErrorMessage.PASSWORD_TOO_SHORT);
         }
 
-        if (!password.matches("^(?=.*[0-9])(?=.*[!@#$%^&*]).*$")) {
+        if (!password.matches("^(?=.*\\d)(?=.*[!@#$%^&*]).*$")) {
             throw new TrackerException(ErrorMessage.PASSWORD_TOO_WEAK);
         }
     }
