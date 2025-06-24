@@ -4,19 +4,19 @@ import hr.tvz.trackerplatform.shared.exception.ErrorMessage;
 import hr.tvz.trackerplatform.shared.exception.TrackerException;
 import hr.tvz.trackerplatform.user.model.User;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class DailyCheckTest {
 
-    private DailyCheck dailyCheck;
     private User user;
+    private DailyCheck dailyCheck;
     private List<DailyQuestion> questions;
 
     @BeforeEach
@@ -36,14 +36,14 @@ class DailyCheckTest {
     @Test
     void testDefaultConstructor() {
         DailyCheck check = new DailyCheck();
-        assertNotNull(check.getUuid());
-        assertNotNull(check.getCheckInDate());
-        assertNotNull(check.getCreatedAt());
-        assertNotNull(check.getQuestions());
-        assertFalse(check.isCompleted());
-        assertNull(check.getId());
-        assertNull(check.getUser());
-        assertNull(check.getCompletedAt());
+        assertThat(check.getUuid()).isNotNull();
+        assertThat(check.getCheckInDate()).isNotNull();
+        assertThat(check.getCreatedAt()).isNotNull();
+        assertThat(check.getQuestions()).isNotNull();
+        assertThat(check.isCompleted()).isFalse();
+        assertThat(check.getId()).isNull();
+        assertThat(check.getUser()).isNull();
+        assertThat(check.getCompletedAt()).isNull();
     }
 
     @Test
@@ -57,14 +57,14 @@ class DailyCheckTest {
 
         DailyCheck check = new DailyCheck(id, uuid, user, checkInDate, createdAt, completedAt, questions, completed);
 
-        assertEquals(id, check.getId());
-        assertEquals(uuid, check.getUuid());
-        assertEquals(user, check.getUser());
-        assertEquals(checkInDate, check.getCheckInDate());
-        assertEquals(createdAt, check.getCreatedAt());
-        assertEquals(completedAt, check.getCompletedAt());
-        assertEquals(questions, check.getQuestions());
-        assertTrue(check.isCompleted());
+        assertThat(check.getId()).isEqualTo(id);
+        assertThat(check.getUuid()).isEqualTo(uuid);
+        assertThat(check.getUser()).isEqualTo(user);
+        assertThat(check.getCheckInDate()).isEqualTo(checkInDate);
+        assertThat(check.getCreatedAt()).isEqualTo(createdAt);
+        assertThat(check.getCompletedAt()).isEqualTo(completedAt);
+        assertThat(check.getQuestions()).isEqualTo(questions);
+        assertThat(check.isCompleted()).isTrue();
     }
 
     @Test
@@ -82,14 +82,14 @@ class DailyCheckTest {
                 .completed(false)
                 .build();
 
-        assertEquals(uuid, check.getUuid());
-        assertEquals(user, check.getUser());
-        assertEquals(checkInDate, check.getCheckInDate());
-        assertEquals(createdAt, check.getCreatedAt());
-        assertEquals(questions, check.getQuestions());
-        assertFalse(check.isCompleted());
-        assertNull(check.getId());
-        assertNull(check.getCompletedAt());
+        assertThat(check.getUuid()).isEqualTo(uuid);
+        assertThat(check.getUser()).isEqualTo(user);
+        assertThat(check.getCheckInDate()).isEqualTo(checkInDate);
+        assertThat(check.getCreatedAt()).isEqualTo(createdAt);
+        assertThat(check.getQuestions()).isEqualTo(questions);
+        assertThat(check.isCompleted()).isFalse();
+        assertThat(check.getId()).isNull();
+        assertThat(check.getCompletedAt()).isNull();
     }
 
     @Test
@@ -97,9 +97,9 @@ class DailyCheckTest {
         List<DailyQuestion> newQuestions = List.of(new DailyQuestion(), new DailyQuestion());
         dailyCheck.submitResponses(newQuestions);
 
-        assertTrue(dailyCheck.isCompleted());
-        assertNotNull(dailyCheck.getCompletedAt());
-        assertEquals(newQuestions, dailyCheck.getQuestions());
+        assertThat(dailyCheck.isCompleted()).isTrue();
+        assertThat(dailyCheck.getCompletedAt()).isNotNull();
+        assertThat(dailyCheck.getQuestions()).isEqualTo(newQuestions);
     }
 
     @Test
@@ -107,9 +107,9 @@ class DailyCheckTest {
         List<DailyQuestion> newQuestions = Collections.emptyList();
         dailyCheck.submitResponses(newQuestions);
 
-        assertTrue(dailyCheck.isCompleted());
-        assertNotNull(dailyCheck.getCompletedAt());
-        assertEquals(newQuestions, dailyCheck.getQuestions());
+        assertThat(dailyCheck.isCompleted()).isTrue();
+        assertThat(dailyCheck.getCompletedAt()).isNotNull();
+        assertThat(dailyCheck.getQuestions()).isEqualTo(newQuestions);
     }
 
     @Test
@@ -124,22 +124,22 @@ class DailyCheckTest {
 
         TrackerException exception = assertThrows(TrackerException.class, () ->
                 dailyCheck.submitResponses(newQuestions));
-        assertEquals(ErrorMessage.DAILY_CHECK_ALREADY_SUBMITTED, exception.getErrorMessage());
+        assertThat(exception.getErrorMessage()).isEqualTo(ErrorMessage.DAILY_CHECK_ALREADY_SUBMITTED);
     }
 
     @Test
     void testEqualsWithNull() {
-        assertNotEquals(dailyCheck, null);
+        assertThat(dailyCheck).isNotEqualTo(null);
     }
 
     @Test
     void testEqualsWithSameObject() {
-        assertEquals(dailyCheck, dailyCheck);
+        assertThat(dailyCheck).isEqualTo(dailyCheck);
     }
 
     @Test
     void testEqualsWithDifferentClass() {
-        assertNotEquals(dailyCheck, new Object());
+        assertThat(dailyCheck).isNotEqualTo(new Object());
     }
 
     @Test
@@ -166,22 +166,15 @@ class DailyCheckTest {
                 .completed(false)
                 .build();
 
-        assertEquals(check1, check2);
+        assertThat(check1).isEqualTo(check2);
     }
 
     @Test
     void testEqualsWithDifferentId() {
-        DailyCheck check1 = DailyCheck.builder()
-                .id(1L)
-                .uuid(UUID.randomUUID())
-                .build();
+        DailyCheck check1 = DailyCheck.builder().id(1L).uuid(UUID.randomUUID()).build();
+        DailyCheck check2 = DailyCheck.builder().id(2L).uuid(UUID.randomUUID()).build();
 
-        DailyCheck check2 = DailyCheck.builder()
-                .id(2L)
-                .uuid(UUID.randomUUID())
-                .build();
-
-        assertNotEquals(check1, check2);
+        assertThat(check1).isNotEqualTo(check2);
     }
 
     @Test
@@ -212,214 +205,78 @@ class DailyCheckTest {
                 .completed(completed)
                 .build();
 
-        assertEquals(check1, check2);
+        assertThat(check1).isEqualTo(check2);
     }
 
     @Test
     void testEqualsWithNullIdsDifferentUuid() {
-        DailyCheck check1 = DailyCheck.builder()
-                .uuid(UUID.randomUUID())
-                .user(user)
-                .checkInDate(LocalDate.now())
-                .createdAt(Instant.now())
-                .completedAt(Instant.now())
-                .questions(questions)
-                .completed(true)
-                .build();
+        DailyCheck check1 = DailyCheck.builder().uuid(UUID.randomUUID()).user(user).checkInDate(LocalDate.now()).createdAt(Instant.now()).completedAt(Instant.now()).questions(questions).completed(true).build();
+        DailyCheck check2 = DailyCheck.builder().uuid(UUID.randomUUID()).user(user).checkInDate(LocalDate.now()).createdAt(Instant.now()).completedAt(Instant.now()).questions(questions).completed(true).build();
 
-        DailyCheck check2 = DailyCheck.builder()
-                .uuid(UUID.randomUUID())
-                .user(user)
-                .checkInDate(LocalDate.now())
-                .createdAt(Instant.now())
-                .completedAt(Instant.now())
-                .questions(questions)
-                .completed(true)
-                .build();
-
-        assertNotEquals(check1, check2);
+        assertThat(check1).isNotEqualTo(check2);
     }
 
     @Test
     void testEqualsWithNullIdsDifferentCheckInDate() {
-        DailyCheck check1 = DailyCheck.builder()
-                .uuid(dailyCheck.getUuid())
-                .user(user)
-                .checkInDate(LocalDate.now())
-                .createdAt(Instant.now())
-                .completedAt(Instant.now())
-                .questions(questions)
-                .completed(true)
-                .build();
+        DailyCheck check1 = DailyCheck.builder().uuid(dailyCheck.getUuid()).user(user).checkInDate(LocalDate.now()).createdAt(Instant.now()).completedAt(Instant.now()).questions(questions).completed(true).build();
+        DailyCheck check2 = DailyCheck.builder().uuid(dailyCheck.getUuid()).user(user).checkInDate(LocalDate.now().plusDays(1)).createdAt(Instant.now()).completedAt(Instant.now()).questions(questions).completed(true).build();
 
-        DailyCheck check2 = DailyCheck.builder()
-                .uuid(dailyCheck.getUuid())
-                .user(user)
-                .checkInDate(LocalDate.now().plusDays(1))
-                .createdAt(Instant.now())
-                .completedAt(Instant.now())
-                .questions(questions)
-                .completed(true)
-                .build();
-
-        assertNotEquals(check1, check2);
+        assertThat(check1).isNotEqualTo(check2);
     }
 
     @Test
     void testEqualsWithNullIdsDifferentCreatedAt() {
-        DailyCheck check1 = DailyCheck.builder()
-                .uuid(dailyCheck.getUuid())
-                .user(user)
-                .checkInDate(LocalDate.now())
-                .createdAt(Instant.now())
-                .completedAt(Instant.now())
-                .questions(questions)
-                .completed(true)
-                .build();
+        DailyCheck check1 = DailyCheck.builder().uuid(dailyCheck.getUuid()).user(user).checkInDate(LocalDate.now()).createdAt(Instant.now()).completedAt(Instant.now()).questions(questions).completed(true).build();
+        DailyCheck check2 = DailyCheck.builder().uuid(dailyCheck.getUuid()).user(user).checkInDate(LocalDate.now()).createdAt(Instant.now().plusSeconds(1000)).completedAt(Instant.now()).questions(questions).completed(true).build();
 
-        DailyCheck check2 = DailyCheck.builder()
-                .uuid(dailyCheck.getUuid())
-                .user(user)
-                .checkInDate(LocalDate.now())
-                .createdAt(Instant.now().plusSeconds(1000))
-                .completedAt(Instant.now())
-                .questions(questions)
-                .completed(true)
-                .build();
-
-        assertNotEquals(check1, check2);
+        assertThat(check1).isNotEqualTo(check2);
     }
 
     @Test
     void testEqualsWithNullIdsDifferentCompletedAt() {
-        DailyCheck check1 = DailyCheck.builder()
-                .uuid(dailyCheck.getUuid())
-                .user(user)
-                .checkInDate(LocalDate.now())
-                .createdAt(Instant.now())
-                .completedAt(Instant.now())
-                .questions(questions)
-                .completed(true)
-                .build();
+        DailyCheck check1 = DailyCheck.builder().uuid(dailyCheck.getUuid()).user(user).checkInDate(LocalDate.now()).createdAt(Instant.now()).completedAt(Instant.now()).questions(questions).completed(true).build();
+        DailyCheck check2 = DailyCheck.builder().uuid(dailyCheck.getUuid()).user(user).checkInDate(LocalDate.now()).createdAt(Instant.now()).completedAt(Instant.now().plusSeconds(1000)).questions(questions).completed(true).build();
 
-        DailyCheck check2 = DailyCheck.builder()
-                .uuid(dailyCheck.getUuid())
-                .user(user)
-                .checkInDate(LocalDate.now())
-                .createdAt(Instant.now())
-                .completedAt(Instant.now().plusSeconds(1000))
-                .questions(questions)
-                .completed(true)
-                .build();
-
-        assertNotEquals(check1, check2);
+        assertThat(check1).isNotEqualTo(check2);
     }
 
     @Test
     void testEqualsWithNullIdsDifferentQuestions() {
-        DailyCheck check1 = DailyCheck.builder()
-                .uuid(dailyCheck.getUuid())
-                .user(user)
-                .checkInDate(LocalDate.now())
-                .createdAt(Instant.now())
-                .completedAt(Instant.now())
-                .questions(List.of(new DailyQuestion()))
-                .completed(true)
-                .build();
+        DailyCheck check1 = DailyCheck.builder().uuid(dailyCheck.getUuid()).user(user).checkInDate(LocalDate.now()).createdAt(Instant.now()).completedAt(Instant.now()).questions(List.of(new DailyQuestion())).completed(true).build();
+        DailyCheck check2 = DailyCheck.builder().uuid(dailyCheck.getUuid()).user(user).checkInDate(LocalDate.now()).createdAt(Instant.now()).completedAt(Instant.now()).questions(List.of(new DailyQuestion(), new DailyQuestion())).completed(true).build();
 
-        DailyCheck check2 = DailyCheck.builder()
-                .uuid(dailyCheck.getUuid())
-                .user(user)
-                .checkInDate(LocalDate.now())
-                .createdAt(Instant.now())
-                .completedAt(Instant.now())
-                .questions(List.of(new DailyQuestion(), new DailyQuestion()))
-                .completed(true)
-                .build();
-
-        assertNotEquals(check1, check2);
+        assertThat(check1).isNotEqualTo(check2);
     }
 
     @Test
     void testEqualsWithNullIdsDifferentCompleted() {
-        DailyCheck check1 = DailyCheck.builder()
-                .uuid(dailyCheck.getUuid())
-                .user(user)
-                .checkInDate(LocalDate.now())
-                .createdAt(Instant.now())
-                .completedAt(Instant.now())
-                .questions(questions)
-                .completed(true)
-                .build();
+        DailyCheck check1 = DailyCheck.builder().uuid(dailyCheck.getUuid()).user(user).checkInDate(LocalDate.now()).createdAt(Instant.now()).completedAt(Instant.now()).questions(questions).completed(true).build();
+        DailyCheck check2 = DailyCheck.builder().uuid(dailyCheck.getUuid()).user(user).checkInDate(LocalDate.now()).createdAt(Instant.now()).completedAt(Instant.now()).questions(questions).completed(false).build();
 
-        DailyCheck check2 = DailyCheck.builder()
-                .uuid(dailyCheck.getUuid())
-                .user(user)
-                .checkInDate(LocalDate.now())
-                .createdAt(Instant.now())
-                .completedAt(Instant.now())
-                .questions(questions)
-                .completed(false)
-                .build();
-
-        assertNotEquals(check1, check2);
+        assertThat(check1).isNotEqualTo(check2);
     }
 
     @Test
     void testEqualsWithNullIdsAllNullFields() {
-        DailyCheck check1 = DailyCheck.builder()
-                .uuid(null)
-                .user(null)
-                .checkInDate(null)
-                .createdAt(null)
-                .completedAt(null)
-                .questions(null)
-                .completed(false)
-                .build();
+        DailyCheck check1 = DailyCheck.builder().uuid(null).user(null).checkInDate(null).createdAt(null).completedAt(null).questions(null).completed(false).build();
+        DailyCheck check2 = DailyCheck.builder().uuid(null).user(null).checkInDate(null).createdAt(null).completedAt(null).questions(null).completed(false).build();
 
-        DailyCheck check2 = DailyCheck.builder()
-                .uuid(null)
-                .user(null)
-                .checkInDate(null)
-                .createdAt(null)
-                .completedAt(null)
-                .questions(null)
-                .completed(false)
-                .build();
-
-        assertEquals(check1, check2);
+        assertThat(check1).isEqualTo(check2);
     }
 
     @Test
     void testEqualsWithNullIdsSomeNullFields() {
-        DailyCheck check1 = DailyCheck.builder()
-                .uuid(dailyCheck.getUuid())
-                .user(null)
-                .checkInDate(LocalDate.now())
-                .createdAt(null)
-                .completedAt(Instant.now())
-                .questions(null)
-                .completed(true)
-                .build();
+        DailyCheck check1 = DailyCheck.builder().uuid(dailyCheck.getUuid()).user(null).checkInDate(LocalDate.now()).createdAt(null).completedAt(Instant.now()).questions(null).completed(true).build();
+        DailyCheck check2 = DailyCheck.builder().uuid(dailyCheck.getUuid()).user(null).checkInDate(LocalDate.now()).createdAt(null).completedAt(Instant.now()).questions(null).completed(true).build();
 
-        DailyCheck check2 = DailyCheck.builder()
-                .uuid(dailyCheck.getUuid())
-                .user(null)
-                .checkInDate(LocalDate.now())
-                .createdAt(null)
-                .completedAt(Instant.now())
-                .questions(null)
-                .completed(true)
-                .build();
-
-        assertEquals(check1, check2);
+        assertThat(check1).isEqualTo(check2);
     }
 
     @Test
     void testHashCodeConsistency() {
         int hashCode1 = dailyCheck.hashCode();
         int hashCode2 = dailyCheck.hashCode();
-        assertEquals(hashCode1, hashCode2);
+        assertThat(hashCode1).isEqualTo(hashCode2);
     }
 
     @Test
@@ -434,7 +291,7 @@ class DailyCheckTest {
                 .completed(dailyCheck.isCompleted())
                 .build();
 
-        assertEquals(dailyCheck.hashCode(), check1.hashCode());
+        assertThat(check1).hasSameHashCodeAs(dailyCheck);
     }
 
     @Test
@@ -449,15 +306,16 @@ class DailyCheckTest {
                 .build();
 
         int hashCode = Objects.hash(null, null, null, null, null, false);
-        assertEquals(hashCode, check.hashCode());
+        assertThat(check.hashCode()).isEqualTo(hashCode);
     }
 
     @Test
     void testToString() {
         String toString = dailyCheck.toString();
-        assertNotNull(toString);
-        assertTrue(toString.contains(dailyCheck.getUuid().toString()));
-        assertTrue(toString.contains(dailyCheck.getCheckInDate().toString()));
+        assertThat(toString)
+                .isNotNull()
+                .contains(dailyCheck.getUuid().toString())
+                .contains(dailyCheck.getCheckInDate().toString());
     }
 
     @Test
@@ -473,6 +331,6 @@ class DailyCheckTest {
                 .build();
 
         String toString = check.toString();
-        assertNotNull(toString);
+        assertThat(toString).isNotNull();
     }
 }
