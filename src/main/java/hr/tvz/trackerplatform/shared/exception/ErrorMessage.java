@@ -19,6 +19,7 @@ public enum ErrorMessage {
     PASSWORD_TOO_WEAK("Password must contain at least one number and one special character", HttpStatus.BAD_REQUEST),
     REFRESH_TOKEN_NOT_FOUND("Refresh token not found", HttpStatus.NOT_FOUND),
     REFRESH_TOKEN_EXPIRED("Refresh token expired", HttpStatus.UNAUTHORIZED),
+    JOURNAL_ENTRY_NOT_FOUND("Journal entry not found", HttpStatus.NOT_FOUND),
     ;
 
     private final String message;

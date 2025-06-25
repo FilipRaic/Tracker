@@ -1,4 +1,4 @@
-package hr.tvz.trackerplatform.shared.service;
+package hr.tvz.trackerplatform;
 
 import hr.tvz.trackerplatform.habit.model.HabitFrequency;
 import hr.tvz.trackerplatform.habit.repository.HabitFrequencyRepository;

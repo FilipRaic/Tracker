@@ -18,9 +18,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AchievementServiceImpl implements AchievementService {
 
+    private final JournalEntryService journalEntryService;
     private final AchievementRepository achievementRepository;
     private final UserAchievementRepository userAchievementRepository;
-    private final JournalEntryService journalEntryService;
 
     @Override
     public List<Achievement> checkAchievements() {

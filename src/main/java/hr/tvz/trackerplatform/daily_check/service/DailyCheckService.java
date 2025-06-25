@@ -22,14 +22,13 @@ import java.util.UUID;
 public class DailyCheckService {
 
     private final Mapper mapper;
-    private final DailyCheckRepository dailyCheckRepository;
     private final UserSecurity userSecurity;
+    private final DailyCheckRepository dailyCheckRepository;
 
     public List<DailyCheckDTO> findAllCompletedCheckIns() {
         User currentUser = userSecurity.getCurrentUser();
-        return mapper.mapList(dailyCheckRepository.findAllByUser(currentUser).stream()
-                .filter(DailyCheck::isCompleted)
-                .toList(), DailyCheckDTO.class);
+
+        return mapper.mapList(dailyCheckRepository.findAllByUserAndCompletedTrue(currentUser), DailyCheckDTO.class);
     }
 
     @Transactional(readOnly = true)

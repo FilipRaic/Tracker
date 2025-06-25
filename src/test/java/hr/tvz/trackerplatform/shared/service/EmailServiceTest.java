@@ -5,7 +5,6 @@ import hr.tvz.trackerplatform.shared.exception.ErrorMessage;
 import hr.tvz.trackerplatform.shared.exception.TrackerException;
 import hr.tvz.trackerplatform.user.enums.Role;
 import hr.tvz.trackerplatform.user.model.User;
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,7 +60,7 @@ class EmailServiceTest {
     }
 
     @Test
-    void sendDailyCheckEmail_shouldSendEmail() throws MessagingException {
+    void sendDailyCheckEmail_shouldSendEmail() {
         UUID uuid = UUID.randomUUID();
         DailyCheck dailyCheck = DailyCheck.builder()
                 .id(1L)
@@ -105,6 +104,44 @@ class EmailServiceTest {
 
         verify(mailSender).createMimeMessage();
         verify(templateEngine).process(eq("daily-check-email"), any(Context.class));
+        verify(mailSender).send(mimeMessage);
+    }
+
+    @Test
+    void sendResetPasswordEmail_shouldSendEmail() {
+        String token = "reset-token-123";
+
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        when(templateEngine.process(eq("reset-password-email"), any(Context.class))).thenReturn("<html>Reset password email content</html>");
+
+        emailService.sendResetPasswordEmail(user, token);
+
+        verify(mailSender).createMimeMessage();
+        verify(templateEngine).process(eq("reset-password-email"), any(Context.class));
+        verify(mailSender).send(mimeMessage);
+
+        ArgumentCaptor<Context> contextCaptor = ArgumentCaptor.forClass(Context.class);
+        verify(templateEngine).process(eq("reset-password-email"), contextCaptor.capture());
+
+        Context capturedContext = contextCaptor.getValue();
+        assertThat(capturedContext.getVariable("firstName")).isEqualTo(user.getFirstName());
+        assertThat(capturedContext.getVariable("resetPasswordUrl")).isEqualTo(frontendUrl + "/reset-password/" + token);
+    }
+
+    @Test
+    void sendResetPasswordEmail_shouldHandleMessagingException() {
+        String token = "reset-token-123";
+
+        when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
+        when(templateEngine.process(eq("reset-password-email"), any(Context.class))).thenReturn("<html>Reset password email content</html>");
+        doThrow(new RuntimeException("Test exception")).when(mailSender).send(mimeMessage);
+
+        assertThatThrownBy(() -> emailService.sendResetPasswordEmail(user, token))
+                .isInstanceOf(TrackerException.class)
+                .hasMessage(ErrorMessage.ERROR_GENERATING_EMAIL.getMessage());
+
+        verify(mailSender).createMimeMessage();
+        verify(templateEngine).process(eq("reset-password-email"), any(Context.class));
         verify(mailSender).send(mimeMessage);
     }
 }

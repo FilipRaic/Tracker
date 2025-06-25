@@ -2,10 +2,7 @@ package hr.tvz.trackerplatform.user.model;
 
 import hr.tvz.trackerplatform.user.enums.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Objects;
 
@@ -19,6 +16,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString(exclude = {"password"})
 public class User {
 
     @Id

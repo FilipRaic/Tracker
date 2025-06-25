@@ -24,14 +24,14 @@ public class UserServiceImpl implements UserService {
 
     private final JwtService jwtService;
     private final EmailService emailService;
-    private final AchievementService achievementService;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AchievementService achievementService;
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
 
-    @Transactional
     @Override
+    @Transactional
     public void register(RegisterRequest request) {
         validatePassword(request.password(), request.passwordsMatch());
 
@@ -51,8 +51,8 @@ public class UserServiceImpl implements UserService {
         achievementService.generateAchievementsForUser(createdUser);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public AuthResponse login(LoginRequest request) {
         try {
             authenticationManager.authenticate(
@@ -76,8 +76,8 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
-    @Transactional
     @Override
+    @Transactional
     public AuthResponse refreshAccessToken(Long userId) {
         return refreshTokenService.findByUserId(userId)
                 .map(refreshTokenService::verifyExpiration)
@@ -89,8 +89,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new TrackerException(ErrorMessage.REFRESH_TOKEN_NOT_FOUND));
     }
 
-    @Transactional(readOnly = true)
     @Override
+    @Transactional(readOnly = true)
     public void sendResetPasswordEmail(ResetPasswordEmailRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(() -> new TrackerException(ErrorMessage.USER_NOT_FOUND));
@@ -100,8 +100,8 @@ public class UserServiceImpl implements UserService {
         emailService.sendResetPasswordEmail(user, token);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public void resetPassword(ResetPasswordRequest request, String email) {
         validatePassword(request.password(), request.passwordsMatch());
 
@@ -122,7 +122,7 @@ public class UserServiceImpl implements UserService {
             throw new TrackerException(ErrorMessage.PASSWORD_TOO_SHORT);
         }
 
-        if (!password.matches("^(?=.*[0-9])(?=.*[!@#$%^&*]).*$")) {
+        if (!password.matches("^(?=.*\\d)(?=.*[!@#$%^&*]).*$")) {
             throw new TrackerException(ErrorMessage.PASSWORD_TOO_WEAK);
         }
     }

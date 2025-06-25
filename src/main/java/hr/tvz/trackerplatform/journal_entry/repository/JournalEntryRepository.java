@@ -7,10 +7,14 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface JournalEntryRepository extends JpaRepository<JournalEntry, Long> {
+
     List<JournalEntry> findAllByUser(User user);
-    JournalEntry findByUserAndDate(User user, LocalDate date);
+
+    Optional<JournalEntry> findByUserAndDate(User user, LocalDate date);
+
     void deleteById(Long id);
 }

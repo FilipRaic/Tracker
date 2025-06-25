@@ -3,17 +3,18 @@ package hr.tvz.trackerplatform.habit.controller;
 import hr.tvz.trackerplatform.habit.dto.HabitDTO;
 import hr.tvz.trackerplatform.habit.dto.HabitStatusDTO;
 import hr.tvz.trackerplatform.habit.service.HabitService;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@AllArgsConstructor
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/habits")
 public class HabitController {
+
     private final HabitService habitService;
 
     @GetMapping

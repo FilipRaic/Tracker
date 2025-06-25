@@ -16,5 +16,7 @@ public interface DailyCheckRepository extends JpaRepository<DailyCheck, Long> {
 
     Optional<DailyCheck> findByUuid(UUID uuid);
 
+    List<DailyCheck> findAllByUserAndCompletedTrue(User user);
+
     boolean existsByCheckInDateAndUser(LocalDate checkInDate, User user);
 }
