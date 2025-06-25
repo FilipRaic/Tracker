@@ -31,6 +31,7 @@ public class HabitServiceImpl implements HabitService {
     @Override
     public List<HabitDTO> findAll() {
         User currentUser = userSecurity.getCurrentUser();
+
         return habitRepository.findAllByUser(currentUser).stream()
                 .map(this::mapToHabitDTO)
                 .toList();
@@ -47,6 +48,7 @@ public class HabitServiceImpl implements HabitService {
             HabitCompletion currentHabitCompletion = findCurrentHabitCompletionOrThrowException(habit);
             habitStatusDTOS.add(mapToHabitWithStatusDTO(currentHabitCompletion));
         }
+
         return habitStatusDTOS;
     }
 
@@ -54,6 +56,7 @@ public class HabitServiceImpl implements HabitService {
     public HabitDTO create(HabitDTO habitDTO) {
         Habit habit = habitRepository.save(mapToHabit(habitDTO));
         fillMissingHabitCompletions(habit);
+
         return mapToHabitDTO(habit);
     }
 
@@ -64,6 +67,7 @@ public class HabitServiceImpl implements HabitService {
         HabitCompletion habitCompletion = findCurrentHabitCompletionOrThrowException(habit);
         habitCompletion.setDone(!habitCompletion.getDone());
         HabitCompletion updatedHabitCompletion = habitCompletionRepository.save(habitCompletion);
+
         return mapToHabitWithStatusDTO(updatedHabitCompletion);
     }
 
@@ -78,6 +82,7 @@ public class HabitServiceImpl implements HabitService {
 
     private HabitCompletion findCurrentHabitCompletionOrThrowException(Habit habit) {
         LocalDate today = LocalDate.now();
+
         return habitCompletionRepository
                 .findFirstByHabitAndCompletionDateGreaterThanEqualOrderByCompletionDateAsc(habit, today)
                 .orElseThrow(() -> new EntityNotFoundException("Habit completion should exist"));
@@ -140,6 +145,7 @@ public class HabitServiceImpl implements HabitService {
         HabitFrequency habitFrequency = habitFrequencyRepository.findByName(habitDTO.getFrequency())
                 .orElseThrow(() -> new EntityNotFoundException("Habit frequency not found!"));
         User currentUser = userSecurity.getCurrentUser();
+
         return Habit.builder()
                 .name(habitDTO.getName())
                 .habitFrequency(habitFrequency)

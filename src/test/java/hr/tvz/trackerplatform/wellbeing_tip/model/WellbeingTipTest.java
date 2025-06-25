@@ -195,4 +195,78 @@ class WellbeingTipTest {
 
         assertThat(tip1.hashCode()).isNotEqualTo(tip2.hashCode());
     }
+
+    @Test
+    void equals_shouldReturnTrue_forSameObjectReference() {
+        WellbeingTip tip = WellbeingTip.builder()
+                .id(1L)
+                .category(QuestionCategory.PHYSICAL)
+                .score(10)
+                .tipText("Drink more water")
+                .build();
+
+        assertThat(tip).isEqualTo(tip);
+    }
+
+    @Test
+    void equals_shouldReturnTrue_forNullFieldsWhenIdsEqual() {
+        WellbeingTip tip1 = WellbeingTip.builder()
+                .id(1L)
+                .build();
+        WellbeingTip tip2 = WellbeingTip.builder()
+                .id(1L)
+                .build();
+
+        assertThat(tip1)
+                .isEqualTo(tip2)
+                .hasSameHashCodeAs(tip2);
+    }
+
+    @Test
+    void equals_shouldReturnFalse_forDifferentTipTextWhenIdsNull() {
+        WellbeingTip tip1 = WellbeingTip.builder()
+                .category(QuestionCategory.PHYSICAL)
+                .score(10)
+                .tipText("Drink more water")
+                .build();
+        WellbeingTip tip2 = WellbeingTip.builder()
+                .category(QuestionCategory.PHYSICAL)
+                .score(10)
+                .tipText("Exercise regularly")
+                .build();
+
+        assertThat(tip1).isNotEqualTo(tip2);
+    }
+
+    @Test
+    void equals_shouldReturnFalse_forDifferentScoreWhenIdsNull() {
+        WellbeingTip tip1 = WellbeingTip.builder()
+                .category(QuestionCategory.PHYSICAL)
+                .score(10)
+                .tipText("Drink more water")
+                .build();
+        WellbeingTip tip2 = WellbeingTip.builder()
+                .category(QuestionCategory.PHYSICAL)
+                .score(20)
+                .tipText("Drink more water")
+                .build();
+
+        assertThat(tip1).isNotEqualTo(tip2);
+    }
+
+    @Test
+    void equals_shouldReturnFalse_forDifferentCategoryWhenIdsNull() {
+        WellbeingTip tip1 = WellbeingTip.builder()
+                .category(QuestionCategory.PHYSICAL)
+                .score(10)
+                .tipText("Drink more water")
+                .build();
+        WellbeingTip tip2 = WellbeingTip.builder()
+                .category(QuestionCategory.SOCIAL)
+                .score(10)
+                .tipText("Drink more water")
+                .build();
+
+        assertThat(tip1).isNotEqualTo(tip2);
+    }
 }

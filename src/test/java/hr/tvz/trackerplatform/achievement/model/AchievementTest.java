@@ -95,7 +95,7 @@ class AchievementTest {
 
     @Test
     void testEqualsWithNull() {
-        assertNotEquals(achievement, null);
+        assertNotEquals(null, achievement);
     }
 
     @Test

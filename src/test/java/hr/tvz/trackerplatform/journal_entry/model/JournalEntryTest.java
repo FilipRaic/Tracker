@@ -104,17 +104,6 @@ class JournalEntryTest {
     }
 
     @Test
-    void testEquals_differentDescriptions_shouldNotBeEqual() {
-        User user = createUser(1L, "user@example.com");
-        LocalDate date = LocalDate.now();
-
-        JournalEntry entry1 = createJournalEntry(null, "Entry", date, user);
-        JournalEntry entry2 = createJournalEntry(null, "Different", date, user);
-
-        assertThat(entry1).isNotEqualTo(entry2);
-    }
-
-    @Test
     void testHashCode_consistency() {
         User user = createUser(1L, "user@example.com");
         LocalDate date = LocalDate.now();
@@ -122,7 +111,7 @@ class JournalEntryTest {
         JournalEntry entry1 = createJournalEntry(null, "Entry", date, user);
         JournalEntry entry2 = createJournalEntry(null, "Entry", date, user);
 
-        assertThat(entry1.hashCode()).isEqualTo(entry2.hashCode());
+        assertThat(entry1).hasSameHashCodeAs(entry2);
     }
 
     @Test

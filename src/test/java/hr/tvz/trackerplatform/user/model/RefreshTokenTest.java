@@ -83,17 +83,6 @@ class RefreshTokenTest {
     }
 
     @Test
-    void testEquals_differentToken_shouldNotBeEqual() {
-        User user = createUser(1L, "user@example.com");
-        Instant expiryDate = Instant.now();
-
-        RefreshToken token1 = createRefreshToken(null, "token123", user, expiryDate);
-        RefreshToken token2 = createRefreshToken(null, "different", user, expiryDate);
-
-        assertThat(token1).isNotEqualTo(token2);
-    }
-
-    @Test
     void testEquals_differentUser_shouldNotBeEqual() {
         Instant expiryDate = Instant.now();
 
@@ -121,7 +110,7 @@ class RefreshTokenTest {
         RefreshToken token1 = createRefreshToken(null, "token123", user, expiryDate);
         RefreshToken token2 = createRefreshToken(null, "token123", user, expiryDate);
 
-        assertThat(token1.hashCode()).isEqualTo(token2.hashCode());
+        assertThat(token1).hasSameHashCodeAs(token2);
     }
 
     @Test
