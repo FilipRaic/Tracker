@@ -1,10 +1,14 @@
 package hr.tvz.trackerplatform;
 
+import hr.tvz.trackerplatform.achievement.model.Achievement;
+import hr.tvz.trackerplatform.achievement.repository.AchievementRepository;
 import hr.tvz.trackerplatform.habit.model.HabitFrequency;
 import hr.tvz.trackerplatform.habit.repository.HabitFrequencyRepository;
 import hr.tvz.trackerplatform.question.enums.QuestionCategory;
 import hr.tvz.trackerplatform.question.model.Question;
 import hr.tvz.trackerplatform.question.repository.QuestionRepository;
+import hr.tvz.trackerplatform.wellbeing_tip.model.WellbeingTip;
+import hr.tvz.trackerplatform.wellbeing_tip.repository.WellbeingTipRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
@@ -22,6 +26,9 @@ public class DataLoadService implements ApplicationRunner {
 
     private final HabitFrequencyRepository habitFrequencyRepository;
     private final QuestionRepository questionRepository;
+    private final WellbeingTipRepository wellbeingTipRepository;
+    private final AchievementRepository achievementRepository;
+
 
     @Override
     public void run(ApplicationArguments args) {
@@ -33,6 +40,16 @@ public class DataLoadService implements ApplicationRunner {
         if (questionRepository.count() == 0) {
             generateDailyQuestionData();
             log.info("Added sample well-being questions");
+        }
+
+        if (wellbeingTipRepository.count() == 0) {
+            generateWellbeingTipData();
+            log.info("Added sample wellbeing tips");
+        }
+
+        if (achievementRepository.count() == 0) {
+            generateAchievementData();
+            log.info("Added sample achievements");
         }
     }
 
@@ -150,6 +167,130 @@ public class DataLoadService implements ApplicationRunner {
                         .content("How well are you communicating with others today?")
                         .contentDe("Wie gut kommunizierst du heute mit anderen?")
                         .contentHr("Koliko dobro danas komuniciraš s drugima?")
+                        .build()
+        ));
+    }
+
+    private void generateWellbeingTipData() {
+        wellbeingTipRepository.saveAll(List.of(
+                WellbeingTip.builder()
+                        .category(QuestionCategory.MENTAL)
+                        .score(1)
+                        .tipText("Try grounding techniques like naming 5 things you can see, hear, or feel to reduce overwhelming thoughts.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.MENTAL)
+                        .score(2)
+                        .tipText("Limit information overload by setting boundaries on news and social media consumption.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.MENTAL)
+                        .score(3)
+                        .tipText("Set simple goals and organize tasks with a planner or to-do list to improve clarity and focus.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.MENTAL)
+                        .score(4)
+                        .tipText("Engage in creative thinking or hobby projects to strengthen cognitive flexibility.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.MENTAL)
+                        .score(5)
+                        .tipText("Maintain mental sharpness by learning a new skill, language, or subject youre curious about.")
+                        .build(),
+
+                WellbeingTip.builder()
+                        .category(QuestionCategory.EMOTIONAL)
+                        .score(1)
+                        .tipText("It’s okay to ask for help—speak to someone you trust or reach out to a mental health professional.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.EMOTIONAL)
+                        .score(2)
+                        .tipText("Allow yourself to feel without suppressing emotions. Writing about your feelings can bring relief.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.EMOTIONAL)
+                        .score(3)
+                        .tipText("Practice self-compassion: talk to yourself as you would to a close friend going through the same situation.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.EMOTIONAL)
+                        .score(4)
+                        .tipText("Continue building emotional intelligence by noticing patterns in your responses and reactions.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.EMOTIONAL)
+                        .score(5)
+                        .tipText("Celebrate your emotional growth and use it to support others or deepen meaningful relationships.")
+                        .build(),
+
+                WellbeingTip.builder()
+                        .category(QuestionCategory.PHYSICAL)
+                        .score(1)
+                        .tipText("Focus on rest and gentle movement—short walks, stretching, or light yoga can help restore balance.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.PHYSICAL)
+                        .score(2)
+                        .tipText("Drink more water and try to eat one balanced meal a day to slowly rebuild your physical foundation.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.PHYSICAL)
+                        .score(3)
+                        .tipText("Add 20–30 minutes of consistent movement to your routine, such as walking, swimming, or cycling.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.PHYSICAL)
+                        .score(4)
+                        .tipText("Balance exercise, nutrition, and sleep to keep your body energized and resilient.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.PHYSICAL)
+                        .score(5)
+                        .tipText("Explore optimizing physical health with strength training, sleep tracking, and performance-based nutrition.")
+                        .build(),
+
+                WellbeingTip.builder()
+                        .category(QuestionCategory.SOCIAL)
+                        .score(1)
+                        .tipText("Send a message to someone you miss. Even small contact helps reduce isolation.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.SOCIAL)
+                        .score(2)
+                        .tipText("Make an effort to connect with one person in a day—this could be a friend, neighbor, or co-worker.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.SOCIAL)
+                        .score(3)
+                        .tipText("Build deeper connections by opening up about how you’re doing and actively listening in return.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.SOCIAL)
+                        .score(4)
+                        .tipText("Plan regular social activities that bring you joy and help you recharge through connection.")
+                        .build(),
+                WellbeingTip.builder()
+                        .category(QuestionCategory.SOCIAL)
+                        .score(5)
+                        .tipText("Strengthen your community by mentoring others, volunteering, or organizing group events.")
+                        .build()
+        ));
+    }
+    private void generateAchievementData() {
+        achievementRepository.saveAll(List.of(
+                Achievement.builder()
+                        .name("Welcome")
+                        .unlockCondition("")
+                        .emoji("😀")
+                        .description("Welcome to our mental health tracker app")
+                        .build(),
+                Achievement.builder()
+                        .name("First page")
+                        .unlockCondition("Write an entry in your journal")
+                        .emoji("📃")
+                        .description("You wrote your first entry in your gratitude journal")
                         .build()
         ));
     }

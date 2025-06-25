@@ -2,15 +2,21 @@ package hr.tvz.trackerplatform.wellbeing_tip.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import hr.tvz.trackerplatform.MockMvcIntegrationTest;
+import hr.tvz.trackerplatform.daily_check.model.DailyCheck;
 import hr.tvz.trackerplatform.daily_check.model.DailyQuestion;
+import hr.tvz.trackerplatform.daily_check.repository.DailyCheckRepository;
 import hr.tvz.trackerplatform.daily_check.repository.DailyQuestionRepository;
 import hr.tvz.trackerplatform.question.enums.QuestionCategory;
+import hr.tvz.trackerplatform.user.enums.Role;
+import hr.tvz.trackerplatform.user.model.User;
+import hr.tvz.trackerplatform.user.repository.UserRepository;
 import hr.tvz.trackerplatform.wellbeing_tip.dto.WellbeingTipDTO;
 import hr.tvz.trackerplatform.wellbeing_tip.model.WellbeingTip;
 import hr.tvz.trackerplatform.wellbeing_tip.repository.WellbeingTipRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,6 +31,11 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
     private WellbeingTipRepository wellbeingTipRepository;
     @Autowired
     private DailyQuestionRepository dailyQuestionRepository;
+    @Autowired
+    private DailyCheckRepository dailyCheckRepository;
+    @Autowired
+    private UserRepository userRepository;
+
 
     @Test
     void findWellbeingTips_shouldReturnTips_whenTipsExist() throws Exception {
@@ -151,5 +162,74 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
         mockMvc.perform(get(BASE_URL))
                 .andExpect(status().is4xxClientError())
                 .andReturn().getResponse();
+    }
+
+    @Test
+    void calculateStreak_shouldReturnStreakOf3_whenConsecutiveDaysCompleted() throws Exception {
+        User user = userRepository.save(User.builder().id(1L).email("test@test.com").build());
+
+        dailyCheckRepository.saveAll(List.of(
+                DailyCheck.builder().user(user).checkInDate(LocalDate.now()).completed(true).build(),
+                DailyCheck.builder().user(user).checkInDate(LocalDate.now().minusDays(1)).completed(true).build(),
+                DailyCheck.builder().user(user).checkInDate(LocalDate.now().minusDays(2)).completed(true).build()
+        ));
+
+        var response = mockMvc.perform(withJwt(get(BASE_URL + "/streak/" + user.getId())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        Integer actual = mapper.readValue(response.getContentAsString(), Integer.class);
+
+        assertThat(actual).isEqualTo(3);
+    }
+
+    @Test
+    void calculateStreak_shouldReturn1_whenYesterdayUncompleted() throws Exception {
+        User user = userRepository.save(User.builder().email("test3@test.com").role(Role.USER).lastName("asd").firstName("asd")
+                .password("password").build());
+
+        dailyCheckRepository.saveAll(List.of(
+                DailyCheck.builder().user(user).checkInDate(LocalDate.now()).completed(true).build(),
+                DailyCheck.builder().user(user).checkInDate(LocalDate.now().minusDays(1)).completed(false).build(),
+                DailyCheck.builder().user(user).checkInDate(LocalDate.now().minusDays(2)).completed(true).build()
+        ));
+
+        var response = mockMvc.perform(withJwt(get(BASE_URL + "/streak/" + user.getId())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        Integer actual = mapper.readValue(response.getContentAsString(), Integer.class);
+
+        assertThat(actual).isEqualTo(1);
+    }
+
+    @Test
+    void calculateStreak_shouldReturnZero_whenNoChecksToday() throws Exception {
+        User user = userRepository.save(User.builder().email("test3@test.com").role(Role.USER).lastName("asd").firstName("asd")
+                .password("password").build());
+        userRepository.flush();
+        dailyCheckRepository.saveAll(List.of(
+                DailyCheck.builder().user(user).checkInDate(LocalDate.now().minusDays(1)).completed(true).build(),
+                DailyCheck.builder().user(user).checkInDate(LocalDate.now().minusDays(2)).completed(true).build()
+        ));
+
+        var response = mockMvc.perform(withJwt(get(BASE_URL + "/streak/" + user.getId())))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        Integer actual = mapper.readValue(response.getContentAsString(), Integer.class);
+
+        assertThat(actual).isEqualTo(2);
+    }
+
+    @Test
+    void calculateStreak_shouldReturnZero_whenUserNotFound() throws Exception {
+        var response = mockMvc.perform(withJwt(get(BASE_URL + "/streak/999")))
+                .andExpect(status().isOk())
+                .andReturn().getResponse();
+
+        Integer actual = mapper.readValue(response.getContentAsString(), Integer.class);
+
+        assertThat(actual).isEqualTo(0);
     }
 }

@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface WellbeingTipService {
     List<WellbeingTipDTO> findByCategoryAndScore(List<DailyQuestion> listQuestions);
+    Integer calculateStreak(Long userId);
 }

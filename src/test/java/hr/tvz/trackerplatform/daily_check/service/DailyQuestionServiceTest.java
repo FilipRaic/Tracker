@@ -33,7 +33,7 @@ class DailyQuestionServiceTest {
 
         when(dailyQuestionRepository.findTop4ByOrderByIdDesc()).thenReturn(expected);
 
-        List<DailyQuestion> actual = dailyQuestionService.findTop4ByOrderByIdDesc();
+        List<DailyQuestion> actual = dailyQuestionService.findTop4ByOrderByIdDesc(1L);
 
         assertThat(actual).isEqualTo(expected);
     }

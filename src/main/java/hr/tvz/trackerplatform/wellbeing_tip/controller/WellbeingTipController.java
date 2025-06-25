@@ -7,6 +7,7 @@ import hr.tvz.trackerplatform.wellbeing_tip.service.WellbeingTipService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,11 +21,19 @@ public class WellbeingTipController {
     private final DailyQuestionService dailyQuestionService;
     private final WellbeingTipService wellbeingTipService;
 
-    @GetMapping
-    public ResponseEntity<List<WellbeingTipDTO>> findWellbeingTips() {
-        List<DailyQuestion> dailyQuestions = dailyQuestionService.findTop4ByOrderByIdDesc();
+    @GetMapping({"{userId}"})
+    public ResponseEntity<List<WellbeingTipDTO>> findWellbeingTips(@PathVariable Long userId) {
+        List<DailyQuestion> dailyQuestions = dailyQuestionService.findTop4ByOrderByIdDesc(userId);
         List<WellbeingTipDTO> wellbeingTipDTOS = wellbeingTipService.findByCategoryAndScore(dailyQuestions);
 
         return ResponseEntity.ok(wellbeingTipDTOS);
     }
+
+    @GetMapping({"/streak/{userId}"})
+    public ResponseEntity<Integer> calculateStreak(@PathVariable Long userId) {
+        Integer streak=wellbeingTipService.calculateStreak(userId);
+
+        return ResponseEntity.ok(streak);
+    }
+
 }
