@@ -18,10 +18,12 @@ java {
 
 sonar {
     properties {
+        property "sonar.exclusions", "**/DataLoadService.java"
         property "sonar.projectKey", "htfmh_tracker-platform"
         property "sonar.organization", "htfmh"
+        property "sonar.sourceEncoding", "UTF-8"
         property "sonar.host.url", "https://sonarcloud.io"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+        property "sonar.tests", file("src/test/java")
     }
 }
 

@@ -73,7 +73,7 @@ class UserTest {
         User user1 = createUser(null, "John", "Doe", "john.doe@example.com", Role.USER);
         User user2 = createUser(null, "John", "Doe", "john.doe@example.com", Role.USER);
 
-        assertThat(user1.hashCode()).isEqualTo(user2.hashCode());
+        assertThat(user1).hasSameHashCodeAs(user2);
     }
 
     @Test

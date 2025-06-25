@@ -10,9 +10,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserAchievementTest {
 
-    private UserAchievement userAchievement;
     private User user;
     private Achievement achievement;
+    private UserAchievement userAchievement;
 
     @BeforeEach
     void setUp() {
@@ -43,8 +43,8 @@ class UserAchievementTest {
     @Test
     void testAllArgsConstructor() {
         Long id = 1L;
-        User user = new User();
-        Achievement achievement = Achievement.builder()
+        user = new User();
+        achievement = Achievement.builder()
                 .name("Marathon Runner")
                 .unlockCondition("Run 10km in a week")
                 .emoji("🏃")
@@ -52,19 +52,19 @@ class UserAchievementTest {
                 .build();
         boolean completed = false;
 
-        UserAchievement ua = new UserAchievement(id, user, achievement, completed);
+        userAchievement = new UserAchievement(id, user, achievement, completed);
 
-        assertEquals(id, ua.getId());
-        assertEquals(user, ua.getUser());
-        assertEquals(achievement, ua.getAchievement());
-        assertEquals(completed, ua.isCompleted());
+        assertEquals(id, userAchievement.getId());
+        assertEquals(user, userAchievement.getUser());
+        assertEquals(achievement, userAchievement.getAchievement());
+        assertEquals(completed, userAchievement.isCompleted());
     }
 
     @Test
     void testBuilder() {
         Long id = 2L;
-        User user = new User();
-        Achievement achievement = Achievement.builder()
+        user = new User();
+        achievement = Achievement.builder()
                 .name("Healthy Eater")
                 .unlockCondition("Log 7 healthy meals")
                 .emoji("🥗")
@@ -72,25 +72,24 @@ class UserAchievementTest {
                 .build();
         boolean completed = true;
 
-        UserAchievement ua = UserAchievement.builder()
+        userAchievement = UserAchievement.builder()
                 .id(id)
                 .user(user)
                 .achievement(achievement)
                 .completed(completed)
                 .build();
 
-        assertEquals(id, ua.getId());
-        assertEquals(user, ua.getUser());
-        assertEquals(achievement, ua.getAchievement());
-        assertEquals(completed, ua.isCompleted());
+        assertEquals(id, userAchievement.getId());
+        assertEquals(user, userAchievement.getUser());
+        assertEquals(achievement, userAchievement.getAchievement());
+        assertEquals(completed, userAchievement.isCompleted());
     }
 
     @Test
     void testGettersAndSetters() {
-        UserAchievement ua = new UserAchievement();
         Long id = 3L;
-        User user = new User();
-        Achievement achievement = Achievement.builder()
+        user = new User();
+        achievement = Achievement.builder()
                 .name("Sleep Master")
                 .unlockCondition("Sleep 8 hours for 7 nights")
                 .emoji("😴")
@@ -98,20 +97,20 @@ class UserAchievementTest {
                 .build();
         boolean completed = false;
 
-        ua.setId(id);
-        ua.setUser(user);
-        ua.setAchievement(achievement);
-        ua.setCompleted(completed);
+        userAchievement.setId(id);
+        userAchievement.setUser(user);
+        userAchievement.setAchievement(achievement);
+        userAchievement.setCompleted(completed);
 
-        assertEquals(id, ua.getId());
-        assertEquals(user, ua.getUser());
-        assertEquals(achievement, ua.getAchievement());
-        assertEquals(completed, ua.isCompleted());
+        assertEquals(id, userAchievement.getId());
+        assertEquals(user, userAchievement.getUser());
+        assertEquals(achievement, userAchievement.getAchievement());
+        assertEquals(completed, userAchievement.isCompleted());
     }
 
     @Test
     void testEqualsWithNull() {
-        assertNotEquals(userAchievement, null);
+        assertNotEquals(null, userAchievement);
     }
 
     @Test

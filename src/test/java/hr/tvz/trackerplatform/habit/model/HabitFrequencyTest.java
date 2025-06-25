@@ -72,7 +72,7 @@ class HabitFrequencyTest {
         HabitFrequency f1 = createHabitFrequency(null, "DAILY");
         HabitFrequency f2 = createHabitFrequency(null, "DAILY");
 
-        assertThat(f1.hashCode()).isEqualTo(f2.hashCode());
+        assertThat(f1).hasSameHashCodeAs(f2);
     }
 
     @Test

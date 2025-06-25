@@ -205,6 +205,146 @@ class HabitServiceTest {
         verify(habitCompletionRepository, times(2)).save(any());
     }
 
+    @Test
+    void changeHabitStatus_shouldThrow_whenHabitCompletionNotFound() {
+        Long habitId = 1L;
+        Habit habit = new Habit(habitId, "Meditate", LocalDate.now(), null, new HabitFrequency(1, "day"), new User());
+        when(habitRepository.findById(habitId)).thenReturn(Optional.of(habit));
+        when(habitCompletionRepository.findFirstByHabitAndCompletionDateGreaterThanEqualOrderByCompletionDateAsc(eq(habit), any()))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> habitService.changeHabitStatus(habitId))
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("Habit completion should exist");
+    }
+
+    @Test
+    void changeHabitStatus_shouldToggleTrueToFalse() {
+        Long habitId = 1L;
+        LocalDate today = LocalDate.now();
+        LocalDate completionDate = today.plusDays(1);
+        HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
+        User user = new User();
+        Habit habit = new Habit(habitId, "Read", today, null, dailyFrequency, user);
+        HabitCompletion habitCompletion = new HabitCompletion(1L, completionDate, true, habit);
+        HabitCompletion changedHabitCompletion = new HabitCompletion(1L, completionDate, false, habit);
+        when(habitRepository.findById(habitId)).thenReturn(Optional.of(habit));
+        when(habitCompletionRepository.findFirstByHabitAndCompletionDateGreaterThanEqualOrderByCompletionDateAsc(eq(habit), any()))
+                .thenReturn(Optional.of(habitCompletion));
+        when(habitCompletionRepository.save(changedHabitCompletion)).thenReturn(changedHabitCompletion);
+        HabitStatusDTO expectedStatus = buildHabitStatusDTO(habit, completionDate, false);
+
+        HabitStatusDTO result = habitService.changeHabitStatus(habitId);
+
+        assertEquals(expectedStatus, result);
+        verify(habitCompletionRepository).save(changedHabitCompletion);
+    }
+
+    @Test
+    void create_shouldCreateCompletionsWithCorrectDates_forDailyFrequency() {
+        User user = new User();
+        LocalDate startDate = LocalDate.now().minusDays(2);
+        HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
+        HabitDTO dto = new HabitDTO(null, "Walk", startDate, dailyFrequency.getName(), "Exercise");
+        Habit savedHabit = new Habit(1L, "Walk", startDate, "Exercise", dailyFrequency, user);
+
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(habitFrequencyRepository.findByName(dailyFrequency.getName())).thenReturn(Optional.of(dailyFrequency));
+        when(habitRepository.save(any())).thenReturn(savedHabit);
+        when(habitCompletionRepository.existsByHabitAndCompletionDate(any(), any())).thenReturn(false);
+        when(habitCompletionRepository.save(any(HabitCompletion.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        habitService.create(dto);
+
+        verify(habitCompletionRepository).save(argThat(completion ->
+                completion.getCompletionDate().equals(startDate.plusDays(1))));
+        verify(habitCompletionRepository).save(argThat(completion ->
+                completion.getCompletionDate().equals(startDate.plusDays(2))));
+    }
+
+    @Test
+    void create_shouldCreateCompletionsWithCorrectDates_forWeeklyFrequency() {
+        User user = new User();
+        LocalDate startDate = LocalDate.now().minusWeeks(2);
+        HabitFrequency weeklyFrequency = new HabitFrequency(1, "week");
+        HabitDTO dto = new HabitDTO(null, "Clean", startDate, weeklyFrequency.getName(), "Housework");
+        Habit savedHabit = new Habit(1L, "Clean", startDate, "Housework", weeklyFrequency, user);
+
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(habitFrequencyRepository.findByName(weeklyFrequency.getName())).thenReturn(Optional.of(weeklyFrequency));
+        when(habitRepository.save(any())).thenReturn(savedHabit);
+        when(habitCompletionRepository.existsByHabitAndCompletionDate(any(), any())).thenReturn(false);
+        when(habitCompletionRepository.save(any(HabitCompletion.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        habitService.create(dto);
+
+        verify(habitCompletionRepository).save(argThat(completion ->
+                completion.getCompletionDate().equals(startDate.plusWeeks(1))));
+        verify(habitCompletionRepository).save(argThat(completion ->
+                completion.getCompletionDate().equals(startDate.plusWeeks(2))));
+    }
+
+    @Test
+    void create_shouldCreateCompletionsWithCorrectDates_forMonthlyFrequency() {
+        User user = new User();
+        LocalDate startDate = LocalDate.now().minusMonths(2);
+        HabitFrequency monthlyFrequency = new HabitFrequency(1, "month");
+        HabitDTO dto = new HabitDTO(null, "Budget", startDate, monthlyFrequency.getName(), "Finance");
+        Habit savedHabit = new Habit(1L, "Budget", startDate, "Finance", monthlyFrequency, user);
+
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(habitFrequencyRepository.findByName(monthlyFrequency.getName())).thenReturn(Optional.of(monthlyFrequency));
+        when(habitRepository.save(any())).thenReturn(savedHabit);
+        when(habitCompletionRepository.existsByHabitAndCompletionDate(any(), any())).thenReturn(false);
+        when(habitCompletionRepository.save(any(HabitCompletion.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        habitService.create(dto);
+
+        verify(habitCompletionRepository).save(argThat(completion ->
+                completion.getCompletionDate().equals(startDate.plusMonths(1))));
+        verify(habitCompletionRepository).save(argThat(completion ->
+                completion.getCompletionDate().equals(startDate.plusMonths(2))));
+    }
+
+    @Test
+    void create_shouldCreateCompletionsWithCorrectDates_forYearlyFrequency() {
+        User user = new User();
+        LocalDate startDate = LocalDate.now().minusYears(2);
+        HabitFrequency yearlyFrequency = new HabitFrequency(1, "year");
+        HabitDTO dto = new HabitDTO(null, "Review", startDate, yearlyFrequency.getName(), "Goals");
+        Habit savedHabit = new Habit(1L, "Review", startDate, "Goals", yearlyFrequency, user);
+
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(habitFrequencyRepository.findByName(yearlyFrequency.getName())).thenReturn(Optional.of(yearlyFrequency));
+        when(habitRepository.save(any())).thenReturn(savedHabit);
+        when(habitCompletionRepository.existsByHabitAndCompletionDate(any(), any())).thenReturn(false);
+        when(habitCompletionRepository.save(any(HabitCompletion.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        habitService.create(dto);
+
+        verify(habitCompletionRepository).save(argThat(completion ->
+                completion.getCompletionDate().equals(startDate.plusYears(1))));
+        verify(habitCompletionRepository).save(argThat(completion ->
+                completion.getCompletionDate().equals(startDate.plusYears(2))));
+    }
+
+    @Test
+    void create_shouldThrow_forInvalidFrequency() {
+        User user = new User();
+        LocalDate startDate = LocalDate.now();
+        HabitFrequency invalidFrequency = new HabitFrequency(1, "invalid");
+        HabitDTO dto = new HabitDTO(null, "Test", startDate, invalidFrequency.getName(), "Note");
+        Habit savedHabit = new Habit(1L, "Test", startDate, "Note", invalidFrequency, user);
+
+        when(userSecurity.getCurrentUser()).thenReturn(user);
+        when(habitFrequencyRepository.findByName(invalidFrequency.getName())).thenReturn(Optional.of(invalidFrequency));
+        when(habitRepository.save(any())).thenReturn(savedHabit);
+
+        assertThatThrownBy(() -> habitService.create(dto))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("Habit Frequency unknown");
+    }
+
     private HabitStatusDTO buildHabitStatusDTO(Habit habit, LocalDate completionDate, boolean done) {
         return HabitStatusDTO.builder()
                 .id(habit.getId())

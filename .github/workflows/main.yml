@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - '**' # Run for pushes to any branch
-  pull_request:
-    branches:
-      - '**' # Run for pull requests to any branch
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
@@ -15,8 +12,8 @@ concurrency:
 permissions:
   contents: read
   id-token: write
-  pull-requests: write # Required for SonarCloud PR decoration
-  checks: write # Required for updating checks on PRs
+  pull-requests: write
+  checks: write
 
 jobs:
   test:

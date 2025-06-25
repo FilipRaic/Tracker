@@ -97,7 +97,7 @@ class HabitCompletionTest {
         HabitCompletion hc1 = createHabitCompletion(null, date, true, habit);
         HabitCompletion hc2 = createHabitCompletion(null, date, true, habit);
 
-        assertThat(hc1.hashCode()).isEqualTo(hc2.hashCode());
+        assertThat(hc1).hasSameHashCodeAs(hc2);
     }
 
     @Test

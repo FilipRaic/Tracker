@@ -73,7 +73,7 @@ class HabitTest {
         Habit h1 = createHabit(null, "Test", date, "desc", freq, user);
         Habit h2 = createHabit(null, "Test", date, "desc", freq, user);
 
-        assertThat(h1.hashCode()).isEqualTo(h2.hashCode());
+        assertThat(h1).hasSameHashCodeAs(h2);
     }
 
     @Test

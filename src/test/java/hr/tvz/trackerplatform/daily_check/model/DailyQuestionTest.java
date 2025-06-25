@@ -106,7 +106,7 @@ class DailyQuestionTest {
 
     @Test
     void testEqualsWithNull() {
-        assertNotEquals(dailyQuestion, null);
+        assertNotEquals(null, dailyQuestion);
     }
 
     @Test

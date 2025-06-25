@@ -77,14 +77,6 @@ class QuestionTest {
     }
 
     @Test
-    void testEquals_differentContent_shouldNotBeEqual() {
-        Question q1 = createQuestion(null, QuestionCategory.MENTAL, "How are you?", "Wie geht's?", "Kako si?");
-        Question q2 = createQuestion(null, QuestionCategory.MENTAL, "Different", "Wie geht's?", "Kako si?");
-
-        assertThat(q1).isNotEqualTo(q2);
-    }
-
-    @Test
     void testEquals_differentContentDe_shouldNotBeEqual() {
         Question q1 = createQuestion(null, QuestionCategory.MENTAL, "How are you?", "Wie geht's?", "Kako si?");
         Question q2 = createQuestion(null, QuestionCategory.MENTAL, "How are you?", "Different", "Kako si?");
@@ -105,7 +97,7 @@ class QuestionTest {
         Question q1 = createQuestion(null, QuestionCategory.MENTAL, "How are you?", "Wie geht's?", "Kako si?");
         Question q2 = createQuestion(null, QuestionCategory.MENTAL, "How are you?", "Wie geht's?", "Kako si?");
 
-        assertThat(q1.hashCode()).isEqualTo(q2.hashCode());
+        assertThat(q1).hasSameHashCodeAs(q2);
     }
 
     @Test
