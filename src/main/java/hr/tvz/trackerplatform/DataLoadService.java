@@ -278,6 +278,7 @@ public class DataLoadService implements ApplicationRunner {
                         .build()
         ));
     }
+
     private void generateAchievementData() {
         achievementRepository.saveAll(List.of(
                 Achievement.builder()
