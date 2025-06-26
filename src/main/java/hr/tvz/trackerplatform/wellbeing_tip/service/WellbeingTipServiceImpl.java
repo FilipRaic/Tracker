@@ -3,6 +3,8 @@ package hr.tvz.trackerplatform.wellbeing_tip.service;
 import hr.tvz.trackerplatform.daily_check.model.DailyCheck;
 import hr.tvz.trackerplatform.daily_check.model.DailyQuestion;
 import hr.tvz.trackerplatform.daily_check.repository.DailyCheckRepository;
+import hr.tvz.trackerplatform.shared.exception.ErrorMessage;
+import hr.tvz.trackerplatform.shared.exception.TrackerException;
 import hr.tvz.trackerplatform.shared.mapper.Mapper;
 import hr.tvz.trackerplatform.user.model.User;
 import hr.tvz.trackerplatform.user.repository.UserRepository;
@@ -42,17 +44,21 @@ public class WellbeingTipServiceImpl implements WellbeingTipService {
     public Integer calculateStreak(Long userId) {
         Integer streak = 0;
         if (userRepository.findById(userId).isPresent()) {
-            User user = userRepository.findById(userId).get();
+            User user = userRepository.findById(userId).
+                    orElseThrow(() -> new TrackerException(ErrorMessage.USER_NOT_FOUND));
+
             List<DailyCheck> dailyCheckList = dailyCheckRepository.findAllByUser(user);
             for (DailyCheck dailyCheck : dailyCheckList) {
                 if (dailyCheck.isCompleted()) {
                     streak++;
                 } else if (dailyCheck.getCheckInDate().equals(LocalDate.now())) {
+                    // No need to do anything
                 } else {
                     break;
                 }
             }
         }
+
         return streak;
     }
 }

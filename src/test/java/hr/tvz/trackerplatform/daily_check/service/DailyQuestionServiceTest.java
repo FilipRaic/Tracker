@@ -2,7 +2,6 @@ package hr.tvz.trackerplatform.daily_check.service;
 
 import hr.tvz.trackerplatform.daily_check.model.DailyQuestion;
 import hr.tvz.trackerplatform.daily_check.repository.DailyCheckRepository;
-import hr.tvz.trackerplatform.daily_check.repository.DailyQuestionRepository;
 import hr.tvz.trackerplatform.question.enums.QuestionCategory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,11 +9,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Comparator;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class DailyQuestionServiceTest {
 
@@ -43,7 +42,7 @@ class DailyQuestionServiceTest {
         assertThat(actual).hasSize(4);
         assertThat(actual)
                 .extracting(DailyQuestion::getId)
-                .containsExactly( 4L, 3L, 2L, 1L);
+                .containsExactly(4L, 3L, 2L, 1L);
     }
 
     private DailyQuestion createQuestion(Long id) {

@@ -18,11 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.LOCAL_DATE_TIME;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -31,13 +29,13 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
     private static final String BASE_URL = "/api/tip";
 
     @Autowired
-    private WellbeingTipRepository wellbeingTipRepository;
-    @Autowired
-    private DailyQuestionRepository dailyQuestionRepository;
+    private UserRepository userRepository;
     @Autowired
     private DailyCheckRepository dailyCheckRepository;
     @Autowired
-    private UserRepository userRepository;
+    private WellbeingTipRepository wellbeingTipRepository;
+    @Autowired
+    private DailyQuestionRepository dailyQuestionRepository;
 
 
     @Test
@@ -92,7 +90,8 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
 
-        List<WellbeingTipDTO> actual = mapper.readValue(response.getContentAsString(), new TypeReference<>() {});
+        List<WellbeingTipDTO> actual = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
+        });
 
         assertThat(actual)
                 .hasSize(2)
@@ -141,7 +140,8 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
 
-        List<WellbeingTipDTO> actual = mapper.readValue(response.getContentAsString(), new TypeReference<>() {});
+        List<WellbeingTipDTO> actual = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
+        });
 
         assertThat(actual).isEmpty();
     }
@@ -150,14 +150,14 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
     void findWellbeingTips_shouldReturnPartialList_whenSomeTipsMatch() throws Exception {
         User user = userRepository.save(User.builder().email("test3@test.com").role(Role.USER).lastName("asd").firstName("asd")
                 .password("password").build());
-        DailyQuestion dailyQuestion1 =DailyQuestion.builder()
+        DailyQuestion dailyQuestion1 = DailyQuestion.builder()
                 .content("Question 2 EN")
                 .contentDe("Question 2 DE")
                 .contentHr("Question 2 HR")
                 .category(QuestionCategory.PHYSICAL)
                 .score(4)
                 .build();
-        DailyQuestion dailyQuestion2= DailyQuestion.builder()
+        DailyQuestion dailyQuestion2 = DailyQuestion.builder()
                 .content("Question 2 EN")
                 .contentDe("Question 2 DE")
                 .contentHr("Question 2 HR")
@@ -175,14 +175,14 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
         dailyCheckRepository.save(
                 DailyCheck.builder()
                         .user(user)
-                        .questions(List.of(dailyQuestion1,dailyQuestion2))
+                        .questions(List.of(dailyQuestion1, dailyQuestion2))
                         .completed(true)
                         .completedAt(Instant.now())
                         .checkInDate(LocalDate.now())
                         .build());
 
 
-        var response = mockMvc.perform(withJwt(get(BASE_URL+"/"+user.getId())))
+        var response = mockMvc.perform(withJwt(get(BASE_URL + "/" + user.getId())))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
 
@@ -274,6 +274,6 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
 
         Integer actual = mapper.readValue(response.getContentAsString(), Integer.class);
 
-        assertThat(actual).isEqualTo(0);
+        assertThat(actual).isZero();
     }
 }

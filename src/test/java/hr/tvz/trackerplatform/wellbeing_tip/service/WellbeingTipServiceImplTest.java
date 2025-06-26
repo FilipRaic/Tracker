@@ -17,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -31,13 +30,12 @@ class WellbeingTipServiceImplTest {
 
     @Mock
     private Mapper mapper;
-
-    @Mock
-    private WellbeingTipRepository wellbeingTipRepository;
     @Mock
     private UserRepository userRepository;
     @Mock
     private DailyCheckRepository dailyCheckRepository;
+    @Mock
+    private WellbeingTipRepository wellbeingTipRepository;
 
     @InjectMocks
     private WellbeingTipServiceImpl wellbeingTipService;
@@ -226,6 +224,6 @@ class WellbeingTipServiceImplTest {
 
         int result = wellbeingTipService.calculateStreak(1L);
 
-        assertThat(result).isEqualTo(0);
+        assertThat(result).isZero();
     }
 }
