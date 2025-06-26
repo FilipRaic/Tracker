@@ -16,10 +16,13 @@ import hr.tvz.trackerplatform.wellbeing_tip.repository.WellbeingTipRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.LOCAL_DATE_TIME;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,22 +42,29 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
 
     @Test
     void findWellbeingTips_shouldReturnTips_whenTipsExist() throws Exception {
-        dailyQuestionRepository.saveAll(List.of(
-                DailyQuestion.builder()
-                        .content("Question 1 EN")
-                        .contentDe("Question 1 DE")
-                        .contentHr("Question 1 HR")
-                        .category(QuestionCategory.PHYSICAL)
-                        .score(2)
-                        .build(),
-                DailyQuestion.builder()
-                        .content("Question 2 EN")
-                        .contentDe("Question 2 DE")
-                        .contentHr("Question 2 HR")
-                        .category(QuestionCategory.MENTAL)
-                        .score(4)
-                        .build()
-        ));
+        User user = userRepository.save(User.builder()
+                .email("test2@test.com")
+                .role(Role.USER)
+                .lastName("last")
+                .firstName("first")
+                .password("password")
+                .build());
+
+        DailyQuestion dailyQuestion1 = DailyQuestion.builder()
+                .content("Question 1 EN")
+                .contentDe("Question 1 DE")
+                .contentHr("Question 1 HR")
+                .category(QuestionCategory.PHYSICAL)
+                .score(2)
+                .build();
+
+        DailyQuestion dailyQuestion2 = DailyQuestion.builder()
+                .content("Question 2 EN")
+                .contentDe("Question 2 DE")
+                .contentHr("Question 2 HR")
+                .category(QuestionCategory.MENTAL)
+                .score(4)
+                .build();
 
         wellbeingTipRepository.saveAll(List.of(
                 WellbeingTip.builder()
@@ -69,12 +79,20 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
                         .build()
         ));
 
-        var response = mockMvc.perform(withJwt(get(BASE_URL)))
+        dailyCheckRepository.save(
+                DailyCheck.builder()
+                        .user(user)
+                        .questions(List.of(dailyQuestion1, dailyQuestion2))
+                        .completed(true)
+                        .completedAt(Instant.now())
+                        .checkInDate(LocalDate.now())
+                        .build());
+
+        var response = mockMvc.perform(withJwt(get(BASE_URL + "/" + user.getId())))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
 
-        List<WellbeingTipDTO> actual = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
-        });
+        List<WellbeingTipDTO> actual = mapper.readValue(response.getContentAsString(), new TypeReference<>() {});
 
         assertThat(actual)
                 .hasSize(2)
@@ -94,43 +112,58 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
 
     @Test
     void findWellbeingTips_shouldReturnEmptyList_whenNoTipsMatch() throws Exception {
-        dailyQuestionRepository.save(
-                DailyQuestion.builder()
-                        .content("Question 2 EN")
-                        .contentDe("Question 2 DE")
-                        .contentHr("Question 2 HR")
-                        .category(QuestionCategory.PHYSICAL)
-                        .score(3)
+        User user = userRepository.save(User.builder()
+                .email("test4@test.com")
+                .role(Role.USER)
+                .lastName("last")
+                .firstName("first")
+                .password("password")
+                .build());
+
+        DailyQuestion dailyQuestion = DailyQuestion.builder()
+                .content("Question 2 EN")
+                .contentDe("Question 2 DE")
+                .contentHr("Question 2 HR")
+                .category(QuestionCategory.PHYSICAL)
+                .score(3)
+                .build();
+
+        dailyCheckRepository.save(
+                DailyCheck.builder()
+                        .user(user)
+                        .questions(List.of(dailyQuestion))
+                        .completed(true)
+                        .completedAt(Instant.now())
+                        .checkInDate(LocalDate.now())
                         .build());
 
-        var response = mockMvc.perform(withJwt(get(BASE_URL)))
+        var response = mockMvc.perform(withJwt(get(BASE_URL + "/" + user.getId())))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
 
-        List<WellbeingTipDTO> actual = mapper.readValue(response.getContentAsString(), new TypeReference<>() {
-        });
+        List<WellbeingTipDTO> actual = mapper.readValue(response.getContentAsString(), new TypeReference<>() {});
 
         assertThat(actual).isEmpty();
     }
 
     @Test
     void findWellbeingTips_shouldReturnPartialList_whenSomeTipsMatch() throws Exception {
-        dailyQuestionRepository.saveAll(List.of(
-                DailyQuestion.builder()
-                        .content("Question 2 EN")
-                        .contentDe("Question 2 DE")
-                        .contentHr("Question 2 HR")
-                        .category(QuestionCategory.PHYSICAL)
-                        .score(4)
-                        .build(),
-                DailyQuestion.builder()
-                        .content("Question 2 EN")
-                        .contentDe("Question 2 DE")
-                        .contentHr("Question 2 HR")
-                        .category(QuestionCategory.MENTAL)
-                        .score(5)
-                        .build()
-        ));
+        User user = userRepository.save(User.builder().email("test3@test.com").role(Role.USER).lastName("asd").firstName("asd")
+                .password("password").build());
+        DailyQuestion dailyQuestion1 =DailyQuestion.builder()
+                .content("Question 2 EN")
+                .contentDe("Question 2 DE")
+                .contentHr("Question 2 HR")
+                .category(QuestionCategory.PHYSICAL)
+                .score(4)
+                .build();
+        DailyQuestion dailyQuestion2= DailyQuestion.builder()
+                .content("Question 2 EN")
+                .contentDe("Question 2 DE")
+                .contentHr("Question 2 HR")
+                .category(QuestionCategory.MENTAL)
+                .score(5)
+                .build();
 
         wellbeingTipRepository.save(
                 WellbeingTip.builder()
@@ -139,7 +172,17 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
                         .tipText("Drink more water")
                         .build());
 
-        var response = mockMvc.perform(withJwt(get(BASE_URL)))
+        dailyCheckRepository.save(
+                DailyCheck.builder()
+                        .user(user)
+                        .questions(List.of(dailyQuestion1,dailyQuestion2))
+                        .completed(true)
+                        .completedAt(Instant.now())
+                        .checkInDate(LocalDate.now())
+                        .build());
+
+
+        var response = mockMvc.perform(withJwt(get(BASE_URL+"/"+user.getId())))
                 .andExpect(status().isOk())
                 .andReturn().getResponse();
 
@@ -166,7 +209,8 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
 
     @Test
     void calculateStreak_shouldReturnStreakOf3_whenConsecutiveDaysCompleted() throws Exception {
-        User user = userRepository.save(User.builder().id(1L).email("test@test.com").build());
+        User user = userRepository.save(User.builder().email("test3@test.com").role(Role.USER).lastName("asd").firstName("asd")
+                .password("password").build());
 
         dailyCheckRepository.saveAll(List.of(
                 DailyCheck.builder().user(user).checkInDate(LocalDate.now()).completed(true).build(),
