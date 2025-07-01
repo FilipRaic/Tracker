@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Repository
 public interface DailyCheckRepository extends JpaRepository<DailyCheck, Long> {
-    List<DailyCheck> findAllByUser(User user);
+    List<DailyCheck> findAllByUserOrderByCheckInDateAsc(User user);
 
     Optional<DailyCheck> findByUuid(UUID uuid);
 

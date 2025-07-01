@@ -133,6 +133,7 @@ class HabitControllerIntegrationTest extends MockMvcIntegrationTest {
                 .completionDate(LocalDate.now())
                 .done(false)
                 .habit(habit)
+                .streak(0)
                 .build());
 
         var response = mockMvc.perform(withJwt(put(BASE_URL + "/status/" + habit.getId())))

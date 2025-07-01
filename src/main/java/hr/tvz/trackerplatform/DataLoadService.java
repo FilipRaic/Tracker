@@ -539,6 +539,7 @@ public class DataLoadService implements ApplicationRunner {
                     .completionDate(completionDate)
                     .done(day != 1)
                     .habit(savedHabits.get(0))
+                    .streak(1)
                     .build());
 
             if (day == 2) {
@@ -546,6 +547,7 @@ public class DataLoadService implements ApplicationRunner {
                         .completionDate(completionDate)
                         .done(true)
                         .habit(savedHabits.get(1))
+                        .streak(0)
                         .build());
             }
 
@@ -554,6 +556,7 @@ public class DataLoadService implements ApplicationRunner {
                         .completionDate(completionDate)
                         .done(true)
                         .habit(savedHabits.get(2))
+                        .streak(0)
                         .build());
             }
         }

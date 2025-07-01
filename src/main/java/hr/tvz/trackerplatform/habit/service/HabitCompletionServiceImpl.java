@@ -42,15 +42,19 @@ public class HabitCompletionServiceImpl implements HabitCompletionService {
 
     private void addHabitCompletionIfNotPresent(Habit habit, LocalDate completionDate) {
         if (!habitCompletionRepository.existsByHabitAndCompletionDate(habit, completionDate)) {
-            addNewHabitCompletion(habit, completionDate);
+            Integer streak = habitCompletionRepository.findFirstByHabitOrderByCompletionDateDesc(habit)
+                    .map(habitCompletion -> habitCompletion.getStreak() + 1)
+                    .orElse(0);
+            addNewHabitCompletion(habit, completionDate, streak);
         }
     }
 
-    private void addNewHabitCompletion(Habit habit, LocalDate completionDate) {
+    private void addNewHabitCompletion(Habit habit, LocalDate completionDate, Integer streak) {
         HabitCompletion habitCompletion = HabitCompletion.builder()
                 .habit(habit)
                 .completionDate(completionDate)
                 .done(false)
+                .streak(streak)
                 .build();
 
         habitCompletionRepository.save(habitCompletion);

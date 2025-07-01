@@ -1,6 +1,7 @@
 package hr.tvz.trackerplatform.shared.service;
 
 import hr.tvz.trackerplatform.daily_check.model.DailyCheck;
+import hr.tvz.trackerplatform.habit.model.Habit;
 import hr.tvz.trackerplatform.shared.exception.ErrorMessage;
 import hr.tvz.trackerplatform.shared.exception.TrackerException;
 import hr.tvz.trackerplatform.user.model.User;
@@ -49,6 +50,31 @@ public class EmailServiceImpl implements EmailService {
             log.info("Daily check email sent to user with ID: {}", user.getId());
         } catch (Exception e) {
             log.error("Failed to send daily check to user with ID: {}", user.getId(), e);
+            throw new TrackerException(ErrorMessage.ERROR_GENERATING_EMAIL);
+        }
+    }
+
+    public void sendStreakWarningEmail(Habit habit) {
+        User user = habit.getUser();
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            helper.setFrom(fromEmail);
+            helper.setTo(user.getEmail());
+            helper.setSubject("You Will Lose Your Streak (" + habit.getName() + ")");
+
+            Context context = new Context();
+            context.setVariable("firstName", user.getFirstName());
+            context.setVariable("habitName", habit.getName());
+
+            String emailContent = templateEngine.process("habit-streak-loss-email", context);
+            helper.setText(emailContent, true);
+
+            mailSender.send(message);
+            log.info("Streak warning email sent to user with ID: {} for Habit: {}", user.getId(), habit.getName());
+        } catch (Exception e) {
+            log.error("Failed to send streak warning email to user with ID: {}", user.getId(), e);
             throw new TrackerException(ErrorMessage.ERROR_GENERATING_EMAIL);
         }
     }

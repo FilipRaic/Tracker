@@ -52,10 +52,10 @@ public class HabitStatusServiceImpl implements HabitStatusService {
 
     private HabitStatusDTO mapToHabitWithStatusDTO(HabitCompletion habitCompletion) {
         return mapToHabitWithStatusDTO(habitCompletion.getHabit(), habitCompletion.getCompletionDate(),
-                habitCompletion.getDone());
+                habitCompletion.getDone(), habitCompletion.getStreak());
     }
 
-    private HabitStatusDTO mapToHabitWithStatusDTO(Habit habit, LocalDate completionDate, boolean done) {
+    private HabitStatusDTO mapToHabitWithStatusDTO(Habit habit, LocalDate completionDate, boolean done, int streak) {
         return HabitStatusDTO.builder()
                 .id(habit.getId())
                 .name(habit.getName())
@@ -64,6 +64,7 @@ public class HabitStatusServiceImpl implements HabitStatusService {
                 .notes(habit.getDescription())
                 .dueDate(completionDate)
                 .done(done)
+                .streak(streak)
                 .build();
     }
 }

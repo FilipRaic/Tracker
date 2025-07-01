@@ -42,19 +42,21 @@ public class WellbeingTipServiceImpl implements WellbeingTipService {
     }
 
     public Integer calculateStreak(Long userId) {
-        Integer streak = 0;
+        int streak = 0;
         if (userRepository.findById(userId).isPresent()) {
             User user = userRepository.findById(userId).
                     orElseThrow(() -> new TrackerException(ErrorMessage.USER_NOT_FOUND));
 
-            List<DailyCheck> dailyCheckList = dailyCheckRepository.findAllByUser(user);
+            List<DailyCheck> dailyCheckList = dailyCheckRepository.findAllByUserOrderByCheckInDateAsc(user);
             for (DailyCheck dailyCheck : dailyCheckList) {
                 if (dailyCheck.isCompleted()) {
                     streak++;
                 } else if (dailyCheck.getCheckInDate().equals(LocalDate.now())) {
-                    // No need to do anything
-                } else {
+                    // Today's check-in doesn't count if not completed
+                    // It should be the last one for consideration
                     break;
+                } else {
+                    streak = 0;
                 }
             }
         }
