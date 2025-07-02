@@ -4,7 +4,7 @@ import hr.tvz.trackerplatform.daily_check.model.DailyCheck;
 import hr.tvz.trackerplatform.daily_check.repository.DailyCheckRepository;
 import hr.tvz.trackerplatform.question.model.Question;
 import hr.tvz.trackerplatform.question.repository.QuestionRepository;
-import hr.tvz.trackerplatform.shared.service.EmailService;
+import hr.tvz.trackerplatform.shared.service.EmailServiceImpl;
 import hr.tvz.trackerplatform.user.enums.Role;
 import hr.tvz.trackerplatform.user.model.User;
 import hr.tvz.trackerplatform.user.repository.UserRepository;
@@ -29,7 +29,7 @@ class DailyCheckSchedulerTest {
     private static User user;
 
     @Mock
-    private EmailService emailService;
+    private EmailServiceImpl emailService;
     @Mock
     private UserRepository userRepository;
     @Mock

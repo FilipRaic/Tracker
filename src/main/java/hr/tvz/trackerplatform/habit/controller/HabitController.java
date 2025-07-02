@@ -3,6 +3,7 @@ package hr.tvz.trackerplatform.habit.controller;
 import hr.tvz.trackerplatform.habit.dto.HabitDTO;
 import hr.tvz.trackerplatform.habit.dto.HabitStatusDTO;
 import hr.tvz.trackerplatform.habit.service.HabitService;
+import hr.tvz.trackerplatform.habit.service.HabitStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.List;
 public class HabitController {
 
     private final HabitService habitService;
+    private final HabitStatusService habitStatusService;
 
     @GetMapping
     public ResponseEntity<List<HabitDTO>> findAllHabits() {
@@ -25,7 +27,7 @@ public class HabitController {
 
     @GetMapping("/status")
     public ResponseEntity<List<HabitStatusDTO>> findCurrentHabitsWithStatus() {
-        List<HabitStatusDTO> currentHabitsWithStatus = habitService.findCurrentHabitsWithStatus();
+        List<HabitStatusDTO> currentHabitsWithStatus = habitStatusService.findCurrentHabitsWithStatus();
         return ResponseEntity.ok(currentHabitsWithStatus);
     }
 
@@ -39,7 +41,7 @@ public class HabitController {
 
     @PutMapping("/status/{habitId}")
     public ResponseEntity<HabitStatusDTO> changeHabitStatus(@PathVariable Long habitId) {
-        HabitStatusDTO habitStatusDTO = habitService.changeHabitStatus(habitId);
+        HabitStatusDTO habitStatusDTO = habitStatusService.changeHabitStatus(habitId);
         return ResponseEntity.ok(habitStatusDTO);
     }
 
