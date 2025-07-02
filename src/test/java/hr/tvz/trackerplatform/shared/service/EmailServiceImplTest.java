@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class EmailServiceTest {
+class EmailServiceImplTest {
 
     private static User user;
 
@@ -40,7 +40,7 @@ class EmailServiceTest {
     private TemplateEngine templateEngine;
 
     @InjectMocks
-    private EmailService emailService;
+    private EmailServiceImpl emailService;
 
     private final String fromEmail = "test@example.com";
     private final String frontendUrl = "http://localhost:3000";

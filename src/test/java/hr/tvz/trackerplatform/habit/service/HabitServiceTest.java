@@ -1,9 +1,7 @@
 package hr.tvz.trackerplatform.habit.service;
 
 import hr.tvz.trackerplatform.habit.dto.HabitDTO;
-import hr.tvz.trackerplatform.habit.dto.HabitStatusDTO;
 import hr.tvz.trackerplatform.habit.model.Habit;
-import hr.tvz.trackerplatform.habit.model.HabitCompletion;
 import hr.tvz.trackerplatform.habit.model.HabitFrequency;
 import hr.tvz.trackerplatform.habit.repository.HabitCompletionRepository;
 import hr.tvz.trackerplatform.habit.repository.HabitFrequencyRepository;
@@ -23,8 +21,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,6 +32,8 @@ class HabitServiceTest {
     private UserSecurity userSecurity;
     @Mock
     private HabitRepository habitRepository;
+    @Mock
+    private HabitCompletionService habitCompletionService;
     @Mock
     private HabitFrequencyRepository habitFrequencyRepository;
     @Mock
@@ -55,6 +55,8 @@ class HabitServiceTest {
         assertEquals(1, result.size());
         assertEquals("Run", result.getFirst().getName());
         assertEquals(habit.getHabitFrequency().getName(), result.getFirst().getFrequency());
+        assertEquals(habit.getBegin(), result.getFirst().getStartDate());
+        assertEquals(habit.getDescription(), result.getFirst().getNotes());
     }
 
     @Test
@@ -62,69 +64,21 @@ class HabitServiceTest {
         User user = new User();
         LocalDate startDate = LocalDate.now();
         HabitFrequency weeklyFrequency = new HabitFrequency(1, "week");
-        HabitDTO dto = new HabitDTO(1L, "Read", startDate, weeklyFrequency.getName(), "Book");
+        HabitDTO dto = new HabitDTO(null, "Read", startDate, weeklyFrequency.getName(), "Book");
         Habit habit = new Habit(1L, "Read", startDate, "Book", weeklyFrequency, user);
         when(userSecurity.getCurrentUser()).thenReturn(user);
         when(habitFrequencyRepository.findByName(weeklyFrequency.getName())).thenReturn(Optional.of(weeklyFrequency));
-        when(habitRepository.save(any())).thenReturn(habit);
+        when(habitRepository.save(any(Habit.class))).thenReturn(habit);
+        doNothing().when(habitCompletionService).fillMissingHabitCompletions(any(Habit.class));
 
         HabitDTO result = habitService.create(dto);
 
-        assertEquals(dto, result);
-    }
-
-    @Test
-    void findCurrentHabitsWithStatus() {
-        User user = new User();
-        LocalDate startDate = LocalDate.now();
-        LocalDate completionDate = startDate.plusDays(1);
-        HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
-        Habit firstHabit = new Habit(1L, "Workout", startDate, null, dailyFrequency, user);
-        Habit secondHabit = new Habit(2L, "Lunch", startDate, null, dailyFrequency, user);
-        Habit thirdHabit = new Habit(3L, "Dinner", startDate, null, dailyFrequency, user);
-        HabitCompletion firstHabitCompletion = new HabitCompletion(1L, completionDate, false, firstHabit);
-        HabitCompletion secondHabitCompletion = new HabitCompletion(1L, completionDate, true, secondHabit);
-        HabitCompletion thirdHabitCompletion = new HabitCompletion(1L, completionDate, false, thirdHabit);
-        HabitStatusDTO firstHabitStatusDTO = buildHabitStatusDTO(firstHabit, completionDate, false);
-        HabitStatusDTO secondHabitStatusDTO = buildHabitStatusDTO(secondHabit, completionDate, true);
-        HabitStatusDTO thirdHabitStatusDTO = buildHabitStatusDTO(thirdHabit, completionDate, false);
-        when(userSecurity.getCurrentUser()).thenReturn(user);
-        when(habitRepository.findAllByUser(user)).thenReturn(List.of(firstHabit, secondHabit, thirdHabit));
-        when(habitCompletionRepository.existsByHabitAndCompletionDate(any(), any())).thenReturn(true);
-        when(habitCompletionRepository.findFirstByHabitAndCompletionDateGreaterThanEqualOrderByCompletionDateAsc(
-                eq(firstHabit), any())).thenReturn(Optional.of(firstHabitCompletion));
-        when(habitCompletionRepository.findFirstByHabitAndCompletionDateGreaterThanEqualOrderByCompletionDateAsc(
-                eq(secondHabit), any())).thenReturn(Optional.of(secondHabitCompletion));
-        when(habitCompletionRepository.findFirstByHabitAndCompletionDateGreaterThanEqualOrderByCompletionDateAsc(
-                eq(thirdHabit), any())).thenReturn(Optional.of(thirdHabitCompletion));
-
-        List<HabitStatusDTO> currentHabitsWithStatus = habitService.findCurrentHabitsWithStatus();
-
-        assertEquals(3, currentHabitsWithStatus.size());
-        assertEquals(firstHabitStatusDTO, currentHabitsWithStatus.get(0));
-        assertEquals(secondHabitStatusDTO, currentHabitsWithStatus.get(1));
-        assertEquals(thirdHabitStatusDTO, currentHabitsWithStatus.get(2));
-    }
-
-    @Test
-    void changeHabitStatus() {
-        User user = new User();
-        Long habitId = 1L;
-        LocalDate today = LocalDate.now();
-        LocalDate completionDate = today.plusDays(1);
-        HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
-        Habit habit = new Habit(habitId, "Workout", today, null, dailyFrequency, user);
-        HabitCompletion habitCompletion = new HabitCompletion(1L, completionDate, false, habit);
-        HabitCompletion changedHabitCompletion = new HabitCompletion(1L, completionDate, true, habit);
-        when(habitRepository.findById(habitId)).thenReturn(Optional.of(habit));
-        when(habitCompletionRepository.findFirstByHabitAndCompletionDateGreaterThanEqualOrderByCompletionDateAsc(
-                eq(habit), any())).thenReturn(Optional.of(habitCompletion));
-        when(habitCompletionRepository.save(changedHabitCompletion)).thenReturn(changedHabitCompletion);
-        HabitStatusDTO expectedStatus = buildHabitStatusDTO(habit, completionDate, true);
-
-        HabitStatusDTO habitStatusDTO = habitService.changeHabitStatus(habitId);
-
-        assertEquals(expectedStatus, habitStatusDTO);
+        assertNotNull(result);
+        assertEquals(dto.getName(), result.getName());
+        assertEquals(dto.getFrequency(), result.getFrequency());
+        assertEquals(dto.getStartDate(), result.getStartDate());
+        assertEquals(dto.getNotes(), result.getNotes());
+        verify(habitCompletionService).fillMissingHabitCompletions(habit);
     }
 
     @Test
@@ -153,32 +107,6 @@ class HabitServiceTest {
     }
 
     @Test
-    void findCurrentHabitsWithStatus_shouldThrow_whenHabitCompletionMissing() {
-        User user = new User();
-        HabitFrequency frequency = new HabitFrequency(1, "day");
-        Habit habit = new Habit(1L, "Read", LocalDate.now(), "Books", frequency, user);
-
-        when(userSecurity.getCurrentUser()).thenReturn(user);
-        when(habitRepository.findAllByUser(user)).thenReturn(List.of(habit));
-        when(habitCompletionRepository.existsByHabitAndCompletionDate(any(), any())).thenReturn(true);
-        when(habitCompletionRepository.findFirstByHabitAndCompletionDateGreaterThanEqualOrderByCompletionDateAsc(eq(habit), any()))
-                .thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> habitService.findCurrentHabitsWithStatus())
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage("Habit completion should exist");
-    }
-
-    @Test
-    void changeHabitStatus_shouldThrow_whenHabitNotFound() {
-        when(habitRepository.findById(42L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> habitService.changeHabitStatus(42L))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage("Habit should exist");
-    }
-
-    @Test
     void deleteHabit_shouldThrow_whenHabitNotFound() {
         when(habitRepository.findById(100L)).thenReturn(Optional.empty());
 
@@ -188,60 +116,7 @@ class HabitServiceTest {
     }
 
     @Test
-    void create_shouldHandleMonthlyFrequency() {
-        User user = new User();
-        LocalDate startDate = LocalDate.now().minusMonths(2);
-        HabitFrequency monthly = new HabitFrequency(1, "month");
-        HabitDTO dto = new HabitDTO(null, "Budget", startDate, monthly.getName(), "Finance");
-        Habit savedHabit = new Habit(1L, "Budget", startDate, "Finance", monthly, user);
-
-        when(userSecurity.getCurrentUser()).thenReturn(user);
-        when(habitFrequencyRepository.findByName(monthly.getName())).thenReturn(Optional.of(monthly));
-        when(habitRepository.save(any())).thenReturn(savedHabit);
-
-        HabitDTO result = habitService.create(dto);
-
-        assertEquals("Budget", result.getName());
-        verify(habitCompletionRepository, times(2)).save(any());
-    }
-
-    @Test
-    void changeHabitStatus_shouldThrow_whenHabitCompletionNotFound() {
-        Long habitId = 1L;
-        Habit habit = new Habit(habitId, "Meditate", LocalDate.now(), null, new HabitFrequency(1, "day"), new User());
-        when(habitRepository.findById(habitId)).thenReturn(Optional.of(habit));
-        when(habitCompletionRepository.findFirstByHabitAndCompletionDateGreaterThanEqualOrderByCompletionDateAsc(eq(habit), any()))
-                .thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> habitService.changeHabitStatus(habitId))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage("Habit completion should exist");
-    }
-
-    @Test
-    void changeHabitStatus_shouldToggleTrueToFalse() {
-        Long habitId = 1L;
-        LocalDate today = LocalDate.now();
-        LocalDate completionDate = today.plusDays(1);
-        HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
-        User user = new User();
-        Habit habit = new Habit(habitId, "Read", today, null, dailyFrequency, user);
-        HabitCompletion habitCompletion = new HabitCompletion(1L, completionDate, true, habit);
-        HabitCompletion changedHabitCompletion = new HabitCompletion(1L, completionDate, false, habit);
-        when(habitRepository.findById(habitId)).thenReturn(Optional.of(habit));
-        when(habitCompletionRepository.findFirstByHabitAndCompletionDateGreaterThanEqualOrderByCompletionDateAsc(eq(habit), any()))
-                .thenReturn(Optional.of(habitCompletion));
-        when(habitCompletionRepository.save(changedHabitCompletion)).thenReturn(changedHabitCompletion);
-        HabitStatusDTO expectedStatus = buildHabitStatusDTO(habit, completionDate, false);
-
-        HabitStatusDTO result = habitService.changeHabitStatus(habitId);
-
-        assertEquals(expectedStatus, result);
-        verify(habitCompletionRepository).save(changedHabitCompletion);
-    }
-
-    @Test
-    void create_shouldCreateCompletionsWithCorrectDates_forDailyFrequency() {
+    void create_shouldHandleDailyFrequency() {
         User user = new User();
         LocalDate startDate = LocalDate.now().minusDays(2);
         HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
@@ -250,20 +125,18 @@ class HabitServiceTest {
 
         when(userSecurity.getCurrentUser()).thenReturn(user);
         when(habitFrequencyRepository.findByName(dailyFrequency.getName())).thenReturn(Optional.of(dailyFrequency));
-        when(habitRepository.save(any())).thenReturn(savedHabit);
-        when(habitCompletionRepository.existsByHabitAndCompletionDate(any(), any())).thenReturn(false);
-        when(habitCompletionRepository.save(any(HabitCompletion.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(habitRepository.save(any(Habit.class))).thenReturn(savedHabit);
+        doNothing().when(habitCompletionService).fillMissingHabitCompletions(any(Habit.class));
 
-        habitService.create(dto);
+        HabitDTO result = habitService.create(dto);
 
-        verify(habitCompletionRepository).save(argThat(completion ->
-                completion.getCompletionDate().equals(startDate.plusDays(1))));
-        verify(habitCompletionRepository).save(argThat(completion ->
-                completion.getCompletionDate().equals(startDate.plusDays(2))));
+        assertEquals("Walk", result.getName());
+        assertEquals(dailyFrequency.getName(), result.getFrequency());
+        verify(habitCompletionService).fillMissingHabitCompletions(savedHabit);
     }
 
     @Test
-    void create_shouldCreateCompletionsWithCorrectDates_forWeeklyFrequency() {
+    void create_shouldHandleWeeklyFrequency() {
         User user = new User();
         LocalDate startDate = LocalDate.now().minusWeeks(2);
         HabitFrequency weeklyFrequency = new HabitFrequency(1, "week");
@@ -272,20 +145,18 @@ class HabitServiceTest {
 
         when(userSecurity.getCurrentUser()).thenReturn(user);
         when(habitFrequencyRepository.findByName(weeklyFrequency.getName())).thenReturn(Optional.of(weeklyFrequency));
-        when(habitRepository.save(any())).thenReturn(savedHabit);
-        when(habitCompletionRepository.existsByHabitAndCompletionDate(any(), any())).thenReturn(false);
-        when(habitCompletionRepository.save(any(HabitCompletion.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(habitRepository.save(any(Habit.class))).thenReturn(savedHabit);
+        doNothing().when(habitCompletionService).fillMissingHabitCompletions(any(Habit.class));
 
-        habitService.create(dto);
+        HabitDTO result = habitService.create(dto);
 
-        verify(habitCompletionRepository).save(argThat(completion ->
-                completion.getCompletionDate().equals(startDate.plusWeeks(1))));
-        verify(habitCompletionRepository).save(argThat(completion ->
-                completion.getCompletionDate().equals(startDate.plusWeeks(2))));
+        assertEquals("Clean", result.getName());
+        assertEquals(weeklyFrequency.getName(), result.getFrequency());
+        verify(habitCompletionService).fillMissingHabitCompletions(savedHabit);
     }
 
     @Test
-    void create_shouldCreateCompletionsWithCorrectDates_forMonthlyFrequency() {
+    void create_shouldHandleMonthlyFrequency() {
         User user = new User();
         LocalDate startDate = LocalDate.now().minusMonths(2);
         HabitFrequency monthlyFrequency = new HabitFrequency(1, "month");
@@ -294,20 +165,18 @@ class HabitServiceTest {
 
         when(userSecurity.getCurrentUser()).thenReturn(user);
         when(habitFrequencyRepository.findByName(monthlyFrequency.getName())).thenReturn(Optional.of(monthlyFrequency));
-        when(habitRepository.save(any())).thenReturn(savedHabit);
-        when(habitCompletionRepository.existsByHabitAndCompletionDate(any(), any())).thenReturn(false);
-        when(habitCompletionRepository.save(any(HabitCompletion.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(habitRepository.save(any(Habit.class))).thenReturn(savedHabit);
+        doNothing().when(habitCompletionService).fillMissingHabitCompletions(any(Habit.class));
 
-        habitService.create(dto);
+        HabitDTO result = habitService.create(dto);
 
-        verify(habitCompletionRepository).save(argThat(completion ->
-                completion.getCompletionDate().equals(startDate.plusMonths(1))));
-        verify(habitCompletionRepository).save(argThat(completion ->
-                completion.getCompletionDate().equals(startDate.plusMonths(2))));
+        assertEquals("Budget", result.getName());
+        assertEquals(monthlyFrequency.getName(), result.getFrequency());
+        verify(habitCompletionService).fillMissingHabitCompletions(savedHabit);
     }
 
     @Test
-    void create_shouldCreateCompletionsWithCorrectDates_forYearlyFrequency() {
+    void create_shouldHandleYearlyFrequency() {
         User user = new User();
         LocalDate startDate = LocalDate.now().minusYears(2);
         HabitFrequency yearlyFrequency = new HabitFrequency(1, "year");
@@ -316,44 +185,34 @@ class HabitServiceTest {
 
         when(userSecurity.getCurrentUser()).thenReturn(user);
         when(habitFrequencyRepository.findByName(yearlyFrequency.getName())).thenReturn(Optional.of(yearlyFrequency));
-        when(habitRepository.save(any())).thenReturn(savedHabit);
-        when(habitCompletionRepository.existsByHabitAndCompletionDate(any(), any())).thenReturn(false);
-        when(habitCompletionRepository.save(any(HabitCompletion.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(habitRepository.save(any(Habit.class))).thenReturn(savedHabit);
+        doNothing().when(habitCompletionService).fillMissingHabitCompletions(any(Habit.class));
 
-        habitService.create(dto);
+        HabitDTO result = habitService.create(dto);
 
-        verify(habitCompletionRepository).save(argThat(completion ->
-                completion.getCompletionDate().equals(startDate.plusYears(1))));
-        verify(habitCompletionRepository).save(argThat(completion ->
-                completion.getCompletionDate().equals(startDate.plusYears(2))));
+        assertEquals("Review", result.getName());
+        assertEquals(yearlyFrequency.getName(), result.getFrequency());
+        verify(habitCompletionService).fillMissingHabitCompletions(savedHabit);
     }
 
     @Test
-    void create_shouldThrow_forInvalidFrequency() {
+    void create_shouldHandleFutureStartDate() {
         User user = new User();
-        LocalDate startDate = LocalDate.now();
-        HabitFrequency invalidFrequency = new HabitFrequency(1, "invalid");
-        HabitDTO dto = new HabitDTO(null, "Test", startDate, invalidFrequency.getName(), "Note");
-        Habit savedHabit = new Habit(1L, "Test", startDate, "Note", invalidFrequency, user);
+        LocalDate startDate = LocalDate.now().plusDays(1);
+        HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
+        HabitDTO dto = new HabitDTO(null, "Walk", startDate, dailyFrequency.getName(), "Exercise");
+        Habit savedHabit = new Habit(1L, "Walk", startDate, "Exercise", dailyFrequency, user);
 
         when(userSecurity.getCurrentUser()).thenReturn(user);
-        when(habitFrequencyRepository.findByName(invalidFrequency.getName())).thenReturn(Optional.of(invalidFrequency));
-        when(habitRepository.save(any())).thenReturn(savedHabit);
+        when(habitFrequencyRepository.findByName(dailyFrequency.getName())).thenReturn(Optional.of(dailyFrequency));
+        when(habitRepository.save(any(Habit.class))).thenReturn(savedHabit);
+        doNothing().when(habitCompletionService).fillMissingHabitCompletions(any(Habit.class));
 
-        assertThatThrownBy(() -> habitService.create(dto))
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Habit Frequency unknown");
-    }
+        HabitDTO result = habitService.create(dto);
 
-    private HabitStatusDTO buildHabitStatusDTO(Habit habit, LocalDate completionDate, boolean done) {
-        return HabitStatusDTO.builder()
-                .id(habit.getId())
-                .name(habit.getName())
-                .startDate(habit.getBegin())
-                .frequency(habit.getHabitFrequency().getName())
-                .notes(habit.getDescription())
-                .dueDate(completionDate)
-                .done(done)
-                .build();
+        assertEquals("Walk", result.getName());
+        assertEquals(dailyFrequency.getName(), result.getFrequency());
+        assertEquals(startDate, result.getStartDate());
+        verify(habitCompletionService).fillMissingHabitCompletions(savedHabit);
     }
 }

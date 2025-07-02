@@ -17,6 +17,7 @@ spring:
           starttls:
             enable: false
             required: false
+    use-mock: false
 
 frontend:
   url: http://localhost:4200

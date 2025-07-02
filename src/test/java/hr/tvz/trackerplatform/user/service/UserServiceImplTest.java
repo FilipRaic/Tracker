@@ -3,7 +3,7 @@ package hr.tvz.trackerplatform.user.service;
 import hr.tvz.trackerplatform.achievement.service.AchievementService;
 import hr.tvz.trackerplatform.shared.exception.ErrorMessage;
 import hr.tvz.trackerplatform.shared.exception.TrackerException;
-import hr.tvz.trackerplatform.shared.service.EmailService;
+import hr.tvz.trackerplatform.shared.service.EmailServiceImpl;
 import hr.tvz.trackerplatform.user.dto.*;
 import hr.tvz.trackerplatform.user.enums.Role;
 import hr.tvz.trackerplatform.user.model.RefreshToken;
@@ -34,7 +34,7 @@ class UserServiceTest {
     @Mock
     private JwtService jwtService;
     @Mock
-    private EmailService emailService;
+    private EmailServiceImpl emailService;
     @Mock
     private UserRepository userRepository;
     @Mock

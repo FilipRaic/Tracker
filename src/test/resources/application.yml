@@ -15,6 +15,7 @@ spring:
           starttls:
             enable: false
             required: false
+    use-mock: true
 
   datasource:
     url: ${DATASOURCE_URL}

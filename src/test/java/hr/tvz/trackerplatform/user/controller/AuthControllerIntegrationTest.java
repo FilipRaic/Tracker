@@ -24,8 +24,6 @@ class AuthControllerIntegrationTest extends MockMvcIntegrationTest {
     private UserRepository userRepository;
     @Autowired
     private RefreshTokenService refreshTokenService;
-    @Autowired
-    private hr.tvz.trackerplatform.shared.service.EmailService emailService;
 
     @Test
     void register_shouldCreateUserSuccessfully() throws Exception {
