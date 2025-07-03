@@ -28,8 +28,14 @@ public class WellbeingTip {
     @Column(name = "score")
     private Integer score;
 
-    @Column(name = "tip_text")
-    private String tipText;
+    @Column(name = "tip_text_en")
+    private String tipTextEn;
+
+    @Column(name = "tip_text_hr")
+    private String tipTextHr;
+
+    @Column(name = "tip_text_de")
+    private String tipTextDe;
 
     @Override
     public boolean equals(Object o) {
@@ -39,11 +45,11 @@ public class WellbeingTip {
         if (Objects.nonNull(id) && Objects.nonNull(that.getId()))
             return id.equals(that.getId());
 
-        return category == that.category && Objects.equals(score, that.score) && Objects.equals(tipText, that.tipText);
+        return category == that.category && Objects.equals(score, that.score) && Objects.equals(tipTextEn, that.tipTextEn);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, category, score, tipText);
+        return Objects.hash(id, category, score, tipTextEn, tipTextHr, tipTextDe);
     }
 }

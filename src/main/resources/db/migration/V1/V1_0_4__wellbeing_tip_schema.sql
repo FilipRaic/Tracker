@@ -4,5 +4,7 @@ CREATE TABLE IF NOT EXISTS public.wellbeing_tip (
     id BIGINT PRIMARY KEY DEFAULT NEXTVAL('seq_wellbeing_tip_generator'),
     category VARCHAR(255) NOT NULL,
     score INTEGER,
-    tip_text TEXT
+    tip_text_en TEXT,
+    tip_text_hr TEXT,
+    tip_text_de TEXT
 );

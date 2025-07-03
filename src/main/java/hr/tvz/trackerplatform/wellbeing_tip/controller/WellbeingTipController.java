@@ -18,9 +18,7 @@ import java.util.List;
 @RequestMapping("/api/tip")
 public class WellbeingTipController {
 
-    private final DailyQuestionService dailyQuestionService;
-    private final WellbeingTipService wellbeingTipService;
-
+    private final DailyQuestionService dailyQuestionService;private final WellbeingTipService wellbeingTipService;
     @GetMapping({"{userId}"})
     public ResponseEntity<List<WellbeingTipDTO>> findWellbeingTips(@PathVariable Long userId) {
         List<DailyQuestion> dailyQuestions = dailyQuestionService.findTop4ByOrderByIdDesc(userId);
