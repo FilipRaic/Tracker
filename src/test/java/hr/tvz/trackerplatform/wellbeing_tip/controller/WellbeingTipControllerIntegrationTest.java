@@ -68,12 +68,12 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
                 WellbeingTip.builder()
                         .category(QuestionCategory.PHYSICAL)
                         .score(2)
-                        .tipText("Drink more water")
+                        .tipTextEn("Drink more water")
                         .build(),
                 WellbeingTip.builder()
                         .category(QuestionCategory.MENTAL)
                         .score(4)
-                        .tipText("Practice mindfulness")
+                        .tipTextEn("Practice mindfulness")
                         .build()
         ));
 
@@ -99,12 +99,12 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
                         WellbeingTipDTO.builder()
                                 .category(QuestionCategory.PHYSICAL)
                                 .score(2)
-                                .tipText("Drink more water")
+                                .tipTextEn("Drink more water")
                                 .build(),
                         WellbeingTipDTO.builder()
                                 .category(QuestionCategory.MENTAL)
                                 .score(4)
-                                .tipText("Practice mindfulness")
+                                .tipTextEn("Practice mindfulness")
                                 .build()
                 );
     }
@@ -169,7 +169,7 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
                 WellbeingTip.builder()
                         .category(QuestionCategory.PHYSICAL)
                         .score(4)
-                        .tipText("Drink more water")
+                        .tipTextEn("Drink more water")
                         .build());
 
         dailyCheckRepository.save(
@@ -195,7 +195,7 @@ class WellbeingTipControllerIntegrationTest extends MockMvcIntegrationTest {
                         WellbeingTipDTO.builder()
                                 .category(QuestionCategory.PHYSICAL)
                                 .score(4)
-                                .tipText("Drink more water")
+                                .tipTextEn("Drink more water")
                                 .build()
                 );
     }

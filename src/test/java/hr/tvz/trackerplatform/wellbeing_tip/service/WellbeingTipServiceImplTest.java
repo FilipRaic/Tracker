@@ -68,26 +68,26 @@ class WellbeingTipServiceImplTest {
                 .id(1L)
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
 
         wellbeingTip2 = WellbeingTip.builder()
                 .id(2L)
                 .category(QuestionCategory.MENTAL)
                 .score(20)
-                .tipText("Practice mindfulness")
+                .tipTextEn("Practice mindfulness")
                 .build();
 
         wellbeingTipDTO1 = WellbeingTipDTO.builder()
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
 
         wellbeingTipDTO2 = WellbeingTipDTO.builder()
                 .category(QuestionCategory.MENTAL)
                 .score(20)
-                .tipText("Practice mindfulness")
+                .tipTextEn("Practice mindfulness")
                 .build();
     }
 

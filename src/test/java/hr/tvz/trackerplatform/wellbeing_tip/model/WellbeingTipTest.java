@@ -16,13 +16,13 @@ class WellbeingTipTest {
                 .id(1L)
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
 
         assertThat(tip.getId()).isEqualTo(1L);
         assertThat(tip.getCategory()).isEqualTo(QuestionCategory.PHYSICAL);
         assertThat(tip.getScore()).isEqualTo(10);
-        assertThat(tip.getTipText()).isEqualTo("Drink more water");
+        assertThat(tip.getTipTextEn()).isEqualTo("Drink more water");
     }
 
     @Test
@@ -32,17 +32,17 @@ class WellbeingTipTest {
         assertThat(tip.getId()).isNull();
         assertThat(tip.getCategory()).isNull();
         assertThat(tip.getScore()).isNull();
-        assertThat(tip.getTipText()).isNull();
+        assertThat(tip.getTipTextEn()).isNull();
     }
 
     @Test
     void allArgsConstructor_shouldCreateWellbeingTip_withAllFields() {
-        WellbeingTip tip = new WellbeingTip(1L, QuestionCategory.PHYSICAL, 10, "Drink more water");
+        WellbeingTip tip = new WellbeingTip(1L, QuestionCategory.PHYSICAL, 10, "Drink more water","","");
 
         assertThat(tip.getId()).isEqualTo(1L);
         assertThat(tip.getCategory()).isEqualTo(QuestionCategory.PHYSICAL);
         assertThat(tip.getScore()).isEqualTo(10);
-        assertThat(tip.getTipText()).isEqualTo("Drink more water");
+        assertThat(tip.getTipTextEn()).isEqualTo("Drink more water");
     }
 
     @Test
@@ -51,12 +51,12 @@ class WellbeingTipTest {
         tip.setId(2L);
         tip.setCategory(QuestionCategory.MENTAL);
         tip.setScore(20);
-        tip.setTipText("Practice mindfulness");
+        tip.setTipTextEn("Practice mindfulness");
 
         assertThat(tip.getId()).isEqualTo(2L);
         assertThat(tip.getCategory()).isEqualTo(QuestionCategory.MENTAL);
         assertThat(tip.getScore()).isEqualTo(20);
-        assertThat(tip.getTipText()).isEqualTo("Practice mindfulness");
+        assertThat(tip.getTipTextEn()).isEqualTo("Practice mindfulness");
     }
 
     @Test
@@ -65,7 +65,7 @@ class WellbeingTipTest {
                 .id(1L)
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
 
         String toString = tip.toString();
@@ -74,7 +74,7 @@ class WellbeingTipTest {
                 .contains("id=1")
                 .contains("category=PHYSICAL")
                 .contains("score=10")
-                .contains("tipText=Drink more water");
+                .contains("tipTextEn=Drink more water");
     }
 
     @Test
@@ -83,13 +83,13 @@ class WellbeingTipTest {
                 .id(1L)
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
         WellbeingTip tip2 = WellbeingTip.builder()
                 .id(1L)
                 .category(QuestionCategory.MENTAL)
                 .score(20)
-                .tipText("Practice mindfulness")
+                .tipTextEn("Practice mindfulness")
                 .build();
 
         assertThat(tip1)
@@ -102,12 +102,12 @@ class WellbeingTipTest {
         WellbeingTip tip1 = WellbeingTip.builder()
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
         WellbeingTip tip2 = WellbeingTip.builder()
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
 
         assertThat(tip1)
@@ -121,13 +121,13 @@ class WellbeingTipTest {
                 .id(1L)
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
         WellbeingTip tip2 = WellbeingTip.builder()
                 .id(2L)
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
 
         assertThat(tip1).isNotEqualTo(tip2);
@@ -138,12 +138,12 @@ class WellbeingTipTest {
         WellbeingTip tip1 = WellbeingTip.builder()
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
         WellbeingTip tip2 = WellbeingTip.builder()
                 .category(QuestionCategory.MENTAL)
                 .score(20)
-                .tipText("Practice mindfulness")
+                .tipTextEn("Practice mindfulness")
                 .build();
 
         assertThat(tip1).isNotEqualTo(tip2);
@@ -155,7 +155,7 @@ class WellbeingTipTest {
                 .id(1L)
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
 
         assertThat(tip)
@@ -169,7 +169,7 @@ class WellbeingTipTest {
                 .id(1L)
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
 
         int hashCode1 = tip.hashCode();
@@ -184,13 +184,13 @@ class WellbeingTipTest {
                 .id(1L)
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
         WellbeingTip tip2 = WellbeingTip.builder()
                 .id(2L)
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
 
         assertThat(tip1.hashCode()).isNotEqualTo(tip2.hashCode());
@@ -202,7 +202,7 @@ class WellbeingTipTest {
                 .id(1L)
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
 
         assertThat(tip).isEqualTo(tip);
@@ -227,12 +227,12 @@ class WellbeingTipTest {
         WellbeingTip tip1 = WellbeingTip.builder()
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
         WellbeingTip tip2 = WellbeingTip.builder()
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Exercise regularly")
+                .tipTextEn("Exercise regularly")
                 .build();
 
         assertThat(tip1).isNotEqualTo(tip2);
@@ -243,12 +243,12 @@ class WellbeingTipTest {
         WellbeingTip tip1 = WellbeingTip.builder()
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
         WellbeingTip tip2 = WellbeingTip.builder()
                 .category(QuestionCategory.PHYSICAL)
                 .score(20)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
 
         assertThat(tip1).isNotEqualTo(tip2);
@@ -259,12 +259,12 @@ class WellbeingTipTest {
         WellbeingTip tip1 = WellbeingTip.builder()
                 .category(QuestionCategory.PHYSICAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
         WellbeingTip tip2 = WellbeingTip.builder()
                 .category(QuestionCategory.SOCIAL)
                 .score(10)
-                .tipText("Drink more water")
+                .tipTextEn("Drink more water")
                 .build();
 
         assertThat(tip1).isNotEqualTo(tip2);

@@ -18,6 +18,12 @@ public class WellbeingTipDTO {
     @Column(name = "score")
     private Integer score;
 
-    @Column(name="tip_text")
-    private String tipText;
+    @Column(name = "tip_text_en")
+    private String tipTextEn;
+
+    @Column(name = "tip_text_hr")
+    private String tipTextHr;
+
+    @Column(name = "tip_text_de")
+    private String tipTextDe;
 }
