@@ -174,13 +174,13 @@ class WellbeingTipServiceImplTest {
     @Test
     void calculateStreak_shouldReturnCorrectStreak_whenDailyChecksAreConsecutive() {
         dailyChecks = List.of(
-                DailyCheck.builder().checkInDate(LocalDate.now()).completed(true).build(),
+                DailyCheck.builder().checkInDate(LocalDate.now().minusDays(2L)).completed(true).build(),
                 DailyCheck.builder().checkInDate(LocalDate.now().minusDays(1L)).completed(true).build(),
-                DailyCheck.builder().checkInDate(LocalDate.now().minusDays(2L)).completed(true).build()
+                DailyCheck.builder().checkInDate(LocalDate.now()).completed(true).build()
         );
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(dailyCheckRepository.findAllByUser(user)).thenReturn(dailyChecks);
+        when(dailyCheckRepository.findAllByUserOrderByCheckInDateAsc(user)).thenReturn(dailyChecks);
 
         Integer result = wellbeingTipService.calculateStreak(1L);
 
@@ -190,13 +190,13 @@ class WellbeingTipServiceImplTest {
     @Test
     void calculateStreak_shouldStopStreak_whenUncompletedDayExists() {
         dailyChecks = List.of(
-                DailyCheck.builder().checkInDate(LocalDate.now()).completed(true).build(),
+                DailyCheck.builder().checkInDate(LocalDate.now().minusDays(2L)).completed(true).build(),
                 DailyCheck.builder().checkInDate(LocalDate.now().minusDays(1L)).completed(false).build(), // streak staje
-                DailyCheck.builder().checkInDate(LocalDate.now().minusDays(2L)).completed(true).build()
-        );
+                DailyCheck.builder().checkInDate(LocalDate.now()).completed(true).build()
+                );
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(dailyCheckRepository.findAllByUser(user)).thenReturn(dailyChecks);
+        when(dailyCheckRepository.findAllByUserOrderByCheckInDateAsc(user)).thenReturn(dailyChecks);
 
         Integer result = wellbeingTipService.calculateStreak(1L);
 
@@ -206,12 +206,12 @@ class WellbeingTipServiceImplTest {
     @Test
     void calculateStreak_shouldIgnoreTodayIfNotCheckedIn() {
         dailyChecks = List.of(
-                DailyCheck.builder().checkInDate(LocalDate.now()).completed(false).build(),
-                DailyCheck.builder().checkInDate(LocalDate.now().minusDays(1L)).completed(true).build()
+                DailyCheck.builder().checkInDate(LocalDate.now().minusDays(1L)).completed(true).build(),
+                DailyCheck.builder().checkInDate(LocalDate.now()).completed(false).build()
         );
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
-        when(dailyCheckRepository.findAllByUser(user)).thenReturn(dailyChecks);
+        when(dailyCheckRepository.findAllByUserOrderByCheckInDateAsc(user)).thenReturn(dailyChecks);
 
         Integer result = wellbeingTipService.calculateStreak(1L);
 

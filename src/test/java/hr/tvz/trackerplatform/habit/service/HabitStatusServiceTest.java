@@ -49,9 +49,9 @@ class HabitStatusServiceTest {
         Habit firstHabit = new Habit(1L, "Workout", startDate, null, dailyFrequency, user);
         Habit secondHabit = new Habit(2L, "Lunch", startDate, null, dailyFrequency, user);
         Habit thirdHabit = new Habit(3L, "Dinner", startDate, null, dailyFrequency, user);
-        HabitCompletion firstHabitCompletion = new HabitCompletion(1L, completionDate, false, firstHabit);
-        HabitCompletion secondHabitCompletion = new HabitCompletion(2L, completionDate, true, secondHabit);
-        HabitCompletion thirdHabitCompletion = new HabitCompletion(3L, completionDate, false, thirdHabit);
+        HabitCompletion firstHabitCompletion = new HabitCompletion(1L, completionDate, false, 0, firstHabit);
+        HabitCompletion secondHabitCompletion = new HabitCompletion(2L, completionDate, true, 0, secondHabit);
+        HabitCompletion thirdHabitCompletion = new HabitCompletion(3L, completionDate, false, 0, thirdHabit);
 
         when(userSecurity.getCurrentUser()).thenReturn(user);
         when(habitRepository.findAllByUser(user)).thenReturn(List.of(firstHabit, secondHabit, thirdHabit));
@@ -77,8 +77,8 @@ class HabitStatusServiceTest {
         LocalDate completionDate = today.plusDays(1);
         HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
         Habit habit = new Habit(habitId, "Workout", today, null, dailyFrequency, user);
-        HabitCompletion habitCompletion = new HabitCompletion(1L, completionDate, false, habit);
-        HabitCompletion changedHabitCompletion = new HabitCompletion(1L, completionDate, true, habit);
+        HabitCompletion habitCompletion = new HabitCompletion(1L, completionDate, false, 0, habit);
+        HabitCompletion changedHabitCompletion = new HabitCompletion(1L, completionDate, true, 0, habit);
 
         when(habitRepository.findById(habitId)).thenReturn(Optional.of(habit));
         when(habitCompletionService.findCurrentHabitCompletionOrThrowException(eq(habit))).thenReturn(habitCompletion);
@@ -87,7 +87,7 @@ class HabitStatusServiceTest {
         HabitStatusDTO habitStatusDTO = habitStatusService.changeHabitStatus(habitId);
 
         assertEquals(buildHabitStatusDTO(habit, completionDate, true), habitStatusDTO);
-        verify(habitCompletionRepository).save(argThat(completion -> completion.getDone()));
+        verify(habitCompletionRepository).save(argThat(HabitCompletion::getDone));
     }
 
     @Test
@@ -138,8 +138,8 @@ class HabitStatusServiceTest {
         HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
         User user = new User();
         Habit habit = new Habit(habitId, "Read", today, null, dailyFrequency, user);
-        HabitCompletion habitCompletion = new HabitCompletion(1L, completionDate, true, habit);
-        HabitCompletion changedHabitCompletion = new HabitCompletion(1L, completionDate, false, habit);
+        HabitCompletion habitCompletion = new HabitCompletion(1L, completionDate, true, 0, habit);
+        HabitCompletion changedHabitCompletion = new HabitCompletion(1L, completionDate, false, 0, habit);
 
         when(habitRepository.findById(habitId)).thenReturn(Optional.of(habit));
         when(habitCompletionService.findCurrentHabitCompletionOrThrowException(eq(habit))).thenReturn(habitCompletion);
@@ -159,8 +159,8 @@ class HabitStatusServiceTest {
         HabitFrequency weeklyFrequency = new HabitFrequency(1, "week");
         User user = new User();
         Habit habit = new Habit(habitId, "Workout", today, null, weeklyFrequency, user);
-        HabitCompletion habitCompletion = new HabitCompletion(1L, completionDate, false, habit);
-        HabitCompletion changedHabitCompletion = new HabitCompletion(1L, completionDate, true, habit);
+        HabitCompletion habitCompletion = new HabitCompletion(1L, completionDate, false, 0, habit);
+        HabitCompletion changedHabitCompletion = new HabitCompletion(1L, completionDate, true, 0, habit);
 
         when(habitRepository.findById(habitId)).thenReturn(Optional.of(habit));
         when(habitCompletionService.findCurrentHabitCompletionOrThrowException(eq(habit))).thenReturn(habitCompletion);
@@ -169,7 +169,7 @@ class HabitStatusServiceTest {
         HabitStatusDTO result = habitStatusService.changeHabitStatus(habitId);
 
         assertEquals(buildHabitStatusDTO(habit, completionDate, true), result);
-        verify(habitCompletionRepository).save(argThat(completion -> completion.getDone()));
+        verify(habitCompletionRepository).save(argThat(HabitCompletion::getDone));
     }
 
     private HabitStatusDTO buildHabitStatusDTO(Habit habit, LocalDate completionDate, boolean done) {

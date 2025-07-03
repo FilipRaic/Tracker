@@ -27,6 +27,9 @@ public class HabitCompletion {
     @Column(nullable = false)
     private Boolean done;
 
+    @Column(nullable = false)
+    private Integer streak;
+
     @ManyToOne
     @JoinColumn(name = "habit_id", nullable = false)
     private Habit habit;
@@ -40,11 +43,11 @@ public class HabitCompletion {
             return id.equals(that.getId());
 
         return Objects.equals(completionDate, that.completionDate) && Objects.equals(done, that.done) &&
-                Objects.equals(habit, that.habit);
+                Objects.equals(streak, that.streak) && Objects.equals(habit, that.habit);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(completionDate, done, habit);
+        return Objects.hash(completionDate, done, streak, habit);
     }
 }

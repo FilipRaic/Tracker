@@ -78,3 +78,6 @@ application:
 scheduler:
   cron:
     daily-check: "0 0 8 * * ?"
+    habit-completion-fill: "0 0 0/8 * * ?"
+    habit-streak-adjust: "0 0 0/12 * * ?"
+    habit-streak-warning: "0 0 18 * * ?"

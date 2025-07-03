@@ -139,7 +139,7 @@ class HabitCompletionServiceTest {
         LocalDate completionDate = today.plusDays(1);
         HabitFrequency dailyFrequency = new HabitFrequency(1, "day");
         Habit habit = new Habit(1L, "Walk", today, "Exercise", dailyFrequency, null);
-        HabitCompletion completion = new HabitCompletion(1L, completionDate, false, habit);
+        HabitCompletion completion = new HabitCompletion(1L, completionDate, false, 0, habit);
 
         when(habitCompletionRepository.findFirstByHabitAndCompletionDateGreaterThanEqualOrderByCompletionDateAsc(eq(habit), eq(today)))
                 .thenReturn(Optional.of(completion));
