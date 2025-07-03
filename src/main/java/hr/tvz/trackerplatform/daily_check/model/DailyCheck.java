@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @Entity
 @Table(
-        uniqueConstraints = {@UniqueConstraint(columnNames = {"check_in_date"}, name = "uk_daily_check_date")},
+        uniqueConstraints = {@UniqueConstraint(columnNames = {"user_id", "check_in_date"}, name = "uk_user_daily_check_date")},
         indexes = {@Index(columnList = "user_id", name = "IX_daily_check_user")}
 )
 @Getter
